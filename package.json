@@ -1,0 +1,46 @@
+{
+  "name": "sdk-workshop",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typegen": "typechain --target=ethers-v6 --input-dir ./src/abi --out-dir ./src/abi",
+    "lint": "prettier --check . && eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "format": "prettier --write . && yarn eslint --fix ."
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.0.0",
+    "@orderly.network/hooks": "1.0.28-alpha.26",
+    "@orderly.network/types": "^0.1.28",
+    "@radix-ui/themes": "^2.0.2",
+    "@web3-onboard/core": "^2.21.2",
+    "@web3-onboard/injected-wallets": "^2.10.11",
+    "@web3-onboard/walletconnect": "^2.5.3",
+    "axios": "^1.6.2",
+    "ethers": "^6.9.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.0",
+    "eslint": "^8.53.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-typescript": "^3.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "prettier": "^3.1.1",
+    "typechain": "^8.3.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
