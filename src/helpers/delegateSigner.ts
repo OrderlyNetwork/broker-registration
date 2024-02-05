@@ -1,6 +1,7 @@
 import { getPublicKeyAsync, utils } from '@noble/ed25519';
 import { Account } from '@orderly.network/core';
-import { encodeBase58, ethers, solidityPackedKeccak256 } from 'ethers';
+import { WalletState } from '@web3-onboard/core';
+import { encodeBase58, ethers, solidityPackedKeccak256, BrowserProvider } from 'ethers';
 
 import { DelegateSigner__factory, Vault__factory } from '../abi';
 
@@ -74,10 +75,11 @@ export type DelegateSignerResponse = {
 };
 
 export async function registerDelegateSigner(
-  wallet: ethers.ContractRunner,
+  wallet: WalletState,
   address: string
 ): Promise<string> {
-  const contract = DelegateSigner__factory.connect(delegateContract, wallet);
+  const provider = new BrowserProvider(wallet.provider);
+  const contract = DelegateSigner__factory.connect(delegateContract, provider);
   const res = await contract.delegate(vaultContract, {
     brokerHash: solidityPackedKeccak256(['string'], ['woofi_dex']),
     delegateSigner: address
@@ -87,7 +89,7 @@ export async function registerDelegateSigner(
 }
 
 export async function announceDelegateSigner(
-  account: Account,
+  wallet: WalletState,
   txHash: ethers.BytesLike
 ): Promise<DelegateSignerResponse> {
   const nonceRes = await fetch(`${BASE_URL}/v1/registration_nonce`);
@@ -103,21 +105,11 @@ export async function announceDelegateSigner(
     txHash
   };
 
-  const toSignatureMessage = {
-    domain: OFF_CHAIN_DOMAIN,
-    message: delegateSignerMessage,
-    primaryType: 'DelegateSigner',
-    types: MESSAGE_TYPES
-  };
-  console.log('delegateSignerMessage', delegateSignerMessage);
-  //   {
-  //     "brokerId": "woofi_dex",
-  //     "chainId": 421614,
-  //     "timestamp": 1706876851044,
-  //     "registrationNonce": 186711792201
-  //  }
-
-  const signature = await account.signTypedData(toSignatureMessage);
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(OFF_CHAIN_DOMAIN, MESSAGE_TYPES, {
+    DelegateSigner: delegateSignerMessage
+  });
 
   const delegateSignerRes = await fetch(`${BASE_URL}/v1/delegate_signer`, {
     method: 'POST',
@@ -127,7 +119,7 @@ export async function announceDelegateSigner(
     body: JSON.stringify({
       message: delegateSignerMessage,
       signature,
-      userAddress: account.address
+      userAddress: wallet.accounts[0].address
     })
   });
   const registerJson = await delegateSignerRes.json();
@@ -137,7 +129,7 @@ export async function announceDelegateSigner(
   return registerJson.data;
 }
 
-export async function delegateAddOrderlyKey(account: Account): Promise<string> {
+export async function delegateAddOrderlyKey(wallet: WalletState): Promise<string> {
   const privateKey = utils.randomPrivateKey();
   const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
   const timestamp = Date.now();
@@ -151,14 +143,11 @@ export async function delegateAddOrderlyKey(account: Account): Promise<string> {
     expiration: timestamp + 1_000 * 60 * 60 * 24 * 365 // 1 year
   };
 
-  const toSignatureMessage = {
-    domain: OFF_CHAIN_DOMAIN,
-    message: addKeyMessage,
-    primaryType: 'DelegateAddOrderlyKey',
-    types: MESSAGE_TYPES
-  };
-
-  const signature = await account.signTypedData(toSignatureMessage);
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(OFF_CHAIN_DOMAIN, MESSAGE_TYPES, {
+    DelegateAddOrderlyKey: addKeyMessage
+  });
 
   const keyRes = await fetch(`${BASE_URL}/v1/delegate_orderly_key`, {
     method: 'POST',
@@ -168,7 +157,7 @@ export async function delegateAddOrderlyKey(account: Account): Promise<string> {
     body: JSON.stringify({
       message: addKeyMessage,
       signature,
-      userAddress: account.address
+      userAddress: wallet.accounts[0].address
     })
   });
   const keyJson = await keyRes.json();
@@ -179,11 +168,12 @@ export async function delegateAddOrderlyKey(account: Account): Promise<string> {
 }
 
 export async function delegateDeposit(
-  wallet: ethers.ContractRunner,
+  wallet: WalletState,
   amount: string,
   accountId: string
 ): Promise<void> {
-  const contract = Vault__factory.connect(vaultContract, wallet);
+  const provider = new BrowserProvider(wallet.provider);
+  const contract = Vault__factory.connect(vaultContract, provider);
   const res = await contract.depositTo(delegateContract, {
     brokerHash: solidityPackedKeccak256(['string'], ['woofi_dex']),
     tokenAmount: amount,

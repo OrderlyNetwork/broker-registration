@@ -2,4 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export { DelegateSigner__factory } from "./DelegateSigner__factory";
+export { NativeUSDC__factory } from "./NativeUSDC__factory";
 export { Vault__factory } from "./Vault__factory";

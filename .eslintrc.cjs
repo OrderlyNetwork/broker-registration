@@ -53,6 +53,12 @@ module.exports = {
         }
       }
     ],
+    'import/no-unresolved': [
+      'error',
+      {
+        ignore: ['.*?.*$']
+      }
+    ],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }]
   }
 };

@@ -1,49 +1,63 @@
-import {
-  useAccount,
-  useChains,
-  useCollateral,
-  useDeposit,
-  useWithdraw
-} from '@orderly.network/hooks';
-import { API } from '@orderly.network/types';
+import { useAccount, useCollateral, useWithdraw } from '@orderly.network/hooks';
 import { Button, Flex, Grid, Heading, Table, TextField } from '@radix-ui/themes';
-import { JsonRpcSigner } from 'ethers';
-import { FC, useMemo, useState } from 'react';
+import { useConnectWallet } from '@web3-onboard/react';
+import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
+import { FC, useEffect, useState } from 'react';
 
+import { NativeUSDC, NativeUSDC__factory } from './abi';
+import { getUSDCAddress, getVaultAddress } from './helpers/addresses';
 import {
   DelegateSignerResponse,
-  delegateContract,
   delegateDeposit,
   delegateSettlePnL,
   delegateWithdraw
 } from './helpers/delegateSigner';
-import { testnetChainId } from './network';
 
 export const Assets: FC<{
-  signer?: JsonRpcSigner;
-  delegateSignerEnabled: boolean;
   delegateSigner?: DelegateSignerResponse;
-}> = ({ signer, delegateSignerEnabled, delegateSigner }) => {
+}> = ({ delegateSigner }) => {
+  const [balance, setBalance] = useState<bigint>();
+  const [allowance, setAllowance] = useState<bigint>();
+  const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
+
+  const [{ wallet }] = useConnectWallet();
   const { account } = useAccount();
   const collateral = useCollateral();
-  const [chains] = useChains('testnet', {
-    filter: (item: API.Chain) => item.network_infos?.chain_id === Number(testnetChainId)
-  });
-
-  const token = useMemo(() => {
-    return Array.isArray(chains) ? chains[0].token_infos[0] : undefined;
-  }, [chains]);
 
   const [amount, setAmount] = useState<string | undefined>();
 
-  const deposit = useDeposit({
-    address: token?.address,
-    decimals: token?.decimals,
-    srcToken: token?.symbol,
-    srcChainId: Number(testnetChainId),
-    depositorAddress: signer?.address
+  const { unsettledPnL } = useWithdraw();
+
+  useEffect(() => {
+    if (!wallet) {
+      setUsdcContract(undefined);
+      return;
+    }
+    const ethersProvider = new BrowserProvider(wallet.provider);
+    setUsdcContract(
+      NativeUSDC__factory.connect(getUSDCAddress(wallet.chains[0].id), ethersProvider)
+    );
+  }, [wallet]);
+
+  useEffect(() => {
+    if (!wallet || !usdcContract) return;
+    const fetchBalanceAndAllowance = async () => {
+      if (!wallet || !usdcContract) return;
+      const address = wallet.accounts[0].address;
+      const bal = await usdcContract.balanceOf(address);
+      setBalance(bal);
+
+      const allow = await usdcContract.allowance(address, getVaultAddress(wallet.chains[0].id));
+      setAllowance(allow);
+    };
+    const interval = setInterval(fetchBalanceAndAllowance, 10_000);
+    fetchBalanceAndAllowance();
+    return () => clearInterval(interval);
+  }, [wallet, usdcContract]);
+
+  const formatter = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2
   });
-  const { withdraw, unsettledPnL } = useWithdraw();
 
   return (
     <Flex style={{ margin: '1.5rem' }} gap="3" align="center" justify="center" direction="column">
@@ -51,27 +65,27 @@ export const Assets: FC<{
       <Table.Root>
         <Table.Body>
           <Table.Row>
-            <Table.RowHeaderCell>Wallet Balance:</Table.RowHeaderCell>
-            <Table.Cell>{deposit.balance}</Table.Cell>
+            <Table.RowHeaderCell>Wallet Balance (USDC):</Table.RowHeaderCell>
+            <Table.Cell>
+              {balance ? formatter.format(Number(formatUnits(balance, 6))) : '-'}
+            </Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.RowHeaderCell>Deposit Balance:</Table.RowHeaderCell>
+            <Table.RowHeaderCell>Vault Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>{collateral.availableBalance}</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.RowHeaderCell>Unsettled PnL:</Table.RowHeaderCell>
+            <Table.RowHeaderCell>Unsettled PnL (USDC):</Table.RowHeaderCell>
             <Table.Cell>{unsettledPnL}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table.Root>
       <Grid
-        columns="2"
-        rows={delegateSignerEnabled ? '5' : '4'}
+        columns="1"
+        rows="4"
         gap="1"
         style={{
-          gridTemplateAreas: delegateSignerEnabled
-            ? `'input input' 'deposit deposit' 'withdraw withdraw' 'mint mint' 'settlepnl settlepnl'`
-            : `'input input' 'deposit withdraw' 'mint mint' 'settlepnl settlepnl'`
+          gridTemplateAreas: `'input' 'deposit' 'withdraw' 'settlepnl'`
         }}
       >
         <TextField.Root style={{ gridArea: 'input' }}>
@@ -88,90 +102,46 @@ export const Assets: FC<{
 
         <Button
           style={{ gridArea: 'deposit' }}
-          disabled={amount == null}
+          disabled={wallet == null || amount == null || usdcContract == null || allowance == null}
           onClick={async () => {
-            if (amount == null) return;
-            if (Number(deposit.allowance) < Number(amount)) {
-              await deposit.approve(amount.toString());
-            } else if (delegateSignerEnabled) {
-              if (!signer || !delegateSigner) return;
-              await delegateDeposit(signer, amount, delegateSigner.account_id);
+            if (wallet == null || amount == null || usdcContract == null || allowance == null)
+              return;
+            const address = wallet.accounts[0].address;
+            const amountBN = parseUnits(amount, 6);
+            if (allowance < amountBN) {
+              await usdcContract.approve(address, amountBN);
             } else {
-              deposit.setQuantity(amount);
-              await deposit.deposit();
+              if (!wallet || !delegateSigner) return;
+              await delegateDeposit(wallet, amount, delegateSigner.account_id);
             }
           }}
         >
-          {Number(deposit.allowance) < Number(amount)
-            ? 'Approve'
-            : delegateSignerEnabled
-              ? 'Deposit to Contract'
-              : 'Deposit'}
+          {allowance == null || amount == null
+            ? 'Deposit to Contract'
+            : allowance < parseUnits(amount, 6)
+              ? 'Approve'
+              : 'Deposit to Contract'}
         </Button>
 
         <Button
           style={{ gridArea: 'withdraw' }}
-          disabled={
-            delegateSignerEnabled ? delegateSigner == null || amount == null : amount == null
-          }
+          disabled={delegateSigner == null || amount == null}
           onClick={async () => {
             if (amount == null) return;
-            if (delegateSignerEnabled) {
-              await delegateWithdraw(account, amount);
-            } else {
-              await withdraw({
-                chainId: Number(testnetChainId),
-                amount: Number(amount),
-                token: 'USDC',
-                allowCrossChainWithdraw: false
-              });
-            }
+            await delegateWithdraw(account, amount);
           }}
         >
-          {delegateSignerEnabled ? 'Withdraw to Contract' : 'Withdraw'}
-        </Button>
-
-        <Button
-          style={{ gridArea: 'mint' }}
-          disabled={signer == null}
-          onClick={async () => {
-            let user_address;
-            if (delegateSignerEnabled) {
-              user_address = delegateContract;
-            } else {
-              user_address = signer?.address;
-            }
-            if (!user_address) return;
-            await fetch('https://testnet-operator-evm.orderly.org/v1/faucet/usdc', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                broker_id: 'woofi_dex',
-                chain_id: testnetChainId,
-                user_address
-              })
-            });
-          }}
-        >
-          Mint 1k USDC
+          Withdraw from Contract
         </Button>
 
         <Button
           style={{ gridArea: 'settlepnl' }}
-          disabled={
-            delegateSignerEnabled ? delegateSigner == null : signer == null && unsettledPnL > 0
-          }
+          disabled={delegateSigner == null}
           onClick={async () => {
-            if (delegateSignerEnabled) {
-              await delegateSettlePnL(account);
-            } else {
-              await account.settle();
-            }
+            await delegateSettlePnL(account);
           }}
         >
-          {delegateSignerEnabled ? 'Settle Delegate PnL' : 'Settle PnL'}
+          Settle Delegate PnL
         </Button>
       </Grid>
     </Flex>
