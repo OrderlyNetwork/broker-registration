@@ -4,6 +4,7 @@ import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { encodeBase58 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
+import { SafeInstructions } from './SafeInstructions';
 import {
   DelegateSignerResponse,
   announceDelegateSigner,
@@ -100,13 +101,15 @@ export const Account: FC<{
           onClick={async () => {
             const address = wallet?.accounts[0]?.address;
             if (!wallet || !connectedChain || !address) return;
-            const hash = await registerDelegateSigner(wallet, connectedChain.id, address);
+            const hash = await registerDelegateSigner(wallet, brokerId, connectedChain.id, address);
             setTxHash(hash);
           }}
         >
           Register Delegate Signer
         </Button>
       )}
+
+      {connectedChain && <SafeInstructions brokerId={brokerId} chainId={connectedChain.id} />}
 
       <Flex direction="column" gap="1">
         <label>

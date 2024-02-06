@@ -81,6 +81,7 @@ export type DelegateSignerResponse = {
 
 export async function registerDelegateSigner(
   wallet: WalletState,
+  brokerId: string,
   chainId: string,
   address: string
 ): Promise<string> {
@@ -88,7 +89,7 @@ export async function registerDelegateSigner(
   const signer = await provider.getSigner();
   const contract = DelegateSigner__factory.connect(exampleDelegateContract, signer);
   const res = await contract.delegate(getVaultAddress(chainId), {
-    brokerHash: solidityPackedKeccak256(['string'], ['woofi_dex']),
+    brokerHash: solidityPackedKeccak256(['string'], [brokerId]),
     delegateSigner: address
   });
   return res.hash;
