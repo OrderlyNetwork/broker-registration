@@ -5,7 +5,7 @@ You can then deposit and withdraw to your respective smart contract account.
 
 The project has been scaffolded via Vitejs and the `react-ts` template.
 
-[Demo page](https://orderlynetwork.github.io/delegate-signer/)
+[App](https://orderlynetwork.github.io/delegate-signer/)
 
 ## Usage
 

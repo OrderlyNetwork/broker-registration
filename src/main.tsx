@@ -1,4 +1,5 @@
 import { Theme } from '@radix-ui/themes';
+import safeModule from '@web3-onboard/gnosis';
 import injectedModule from '@web3-onboard/injected-wallets';
 import { Web3OnboardProvider, init } from '@web3-onboard/react';
 import walletConnectModule from '@web3-onboard/walletconnect';
@@ -17,9 +18,10 @@ const walletConnect = walletConnectModule({
   optionalChains: [421614, 11155420],
   dappUrl: 'https://orderlynetwork.github.io/delegate-signer'
 });
+const safe = safeModule();
 
 const web3Onboard = init({
-  wallets: [injected, walletConnect],
+  wallets: [injected, walletConnect, safe],
   chains: [
     {
       id: '0xa4b1',
