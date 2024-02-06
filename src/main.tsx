@@ -50,6 +50,10 @@ const web3Onboard = init({
   appMetadata: {
     name: 'Orderly Delegate Signer',
     description: 'Delegate Signer functions for multisig wallets'
+  },
+  accountCenter: {
+    desktop: { enabled: false },
+    mobile: { enabled: false }
   }
 });
 

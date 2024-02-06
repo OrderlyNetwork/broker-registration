@@ -1,45 +1,50 @@
-import { Button, Callout, Flex, Heading } from '@radix-ui/themes';
-import { useConnectWallet } from '@web3-onboard/react';
+import { Button, Callout, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
+import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { FC, useState } from 'react';
 
 import {
   DelegateSignerResponse,
   announceDelegateSigner,
   delegateAddOrderlyKey,
-  registerDelegateSigner
-} from './helpers/delegateSigner';
+  registerDelegateSigner,
+  isTestnet
+} from './helpers';
 
 export const Account: FC<{
+  brokerId: string;
+  accountId: string;
   delegateSigner?: DelegateSignerResponse;
   setDelegateSigner: React.Dispatch<React.SetStateAction<DelegateSignerResponse | undefined>>;
-  setDelegateOrderlyKey: React.Dispatch<React.SetStateAction<string | undefined>>;
-}> = ({ delegateSigner, setDelegateSigner, setDelegateOrderlyKey }) => {
-  const [txHash, setTxHash] = useState<string | undefined>();
+  orderlyKey?: Uint8Array;
+  setOrderlyKey: React.Dispatch<React.SetStateAction<Uint8Array | undefined>>;
+}> = ({ brokerId, accountId, delegateSigner, setDelegateSigner, orderlyKey, setOrderlyKey }) => {
+  const [txHash, setTxHash] = useState<string>('');
 
   const [{ wallet }] = useConnectWallet();
+  const [{ connectedChain }] = useSetChain();
 
   return (
-    <Flex style={{ margin: '1.5rem' }} gap="3" align="center" justify="center" direction="column">
+    <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
       <Heading>Account</Heading>
 
-      {/* <Card style={{ maxWidth: 240 }}>
-        {state.accountId ? (
+      <Card style={{ maxWidth: 240 }}>
+        {wallet ? (
           <>
-            <Flex gap="2" direction="column">
-              <Container>
-                <Text as="div" size="2" weight="bold">
-                  Orderly Account ID:
-                </Text>
-                <Text as="div" size="2">
-                  {state.accountId}
-                </Text>
-              </Container>
+            <Flex gap="1" direction="column">
               <Container>
                 <Text as="div" size="2" weight="bold">
                   Address:
                 </Text>
                 <Text as="div" size="2">
-                  {state.address}
+                  {wallet.accounts[0].address}
+                </Text>
+              </Container>
+              <Container>
+                <Text as="div" size="2" weight="bold">
+                  Orderly Account ID:
+                </Text>
+                <Text as="div" size="2">
+                  {accountId ?? '-'}
                 </Text>
               </Container>
               <Container>
@@ -47,7 +52,23 @@ export const Account: FC<{
                   User ID:
                 </Text>
                 <Text as="div" size="2">
-                  {state.userId}
+                  {delegateSigner ? delegateSigner.user_id : '-'}
+                </Text>
+              </Container>
+              <Container>
+                <Text as="div" size="2" weight="bold">
+                  Valid Signer:
+                </Text>
+                <Text as="div" size="2">
+                  {delegateSigner ? delegateSigner.valid_signer : '-'}
+                </Text>
+              </Container>
+              <Container>
+                <Text as="div" size="2" weight="bold">
+                  Orderly Key:
+                </Text>
+                <Text as="div" size="2">
+                  {orderlyKey ? 'OK' : '-'}
                 </Text>
               </Container>
             </Flex>
@@ -57,7 +78,7 @@ export const Account: FC<{
             Not connected!
           </Text>
         )}
-      </Card> */}
+      </Card>
 
       <Callout.Root>
         <Callout.Text>
@@ -65,36 +86,50 @@ export const Account: FC<{
         </Callout.Text>
       </Callout.Root>
 
-      <Button
-        disabled={!wallet || !wallet.accounts[0]}
-        onClick={async () => {
-          const address = wallet?.accounts[0]?.address;
-          if (!wallet || !address) return;
-          const hash = await registerDelegateSigner(wallet, address);
-          setTxHash(hash);
-        }}
-      >
-        Register Delegate Signer
-      </Button>
+      {connectedChain && isTestnet(connectedChain.id) && (
+        <Button
+          disabled={!wallet || !connectedChain || !wallet.accounts[0]}
+          onClick={async () => {
+            const address = wallet?.accounts[0]?.address;
+            if (!wallet || !connectedChain || !address) return;
+            const hash = await registerDelegateSigner(wallet, connectedChain.id, address);
+            setTxHash(hash);
+          }}
+        >
+          Register Delegate Signer
+        </Button>
+      )}
+
+      <Flex direction="column" gap="1">
+        <label>
+          Transaction Hash
+          <TextField.Root>
+            <TextField.Input
+              value={txHash}
+              onChange={(event) => {
+                setTxHash(event.target.value);
+              }}
+            />
+          </TextField.Root>
+        </label>
+        <Button
+          disabled={!wallet || !connectedChain || !brokerId || !txHash}
+          onClick={async () => {
+            if (!wallet || !connectedChain || !brokerId || !txHash) return;
+            const res = await announceDelegateSigner(wallet, connectedChain.id, brokerId, txHash);
+            setDelegateSigner(res);
+          }}
+        >
+          Accept Delegate Signer Link
+        </Button>
+      </Flex>
 
       <Button
-        disabled={!wallet || !wallet.accounts[0] || !txHash}
+        disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
-          const address = wallet?.accounts[0]?.address;
-          if (!wallet || !address || !txHash) return;
-          const res = await announceDelegateSigner(wallet, txHash);
-          setDelegateSigner(res);
-        }}
-      >
-        Announce Delegate Signer
-      </Button>
-
-      <Button
-        disabled={!wallet || delegateSigner == null}
-        onClick={async () => {
-          if (!wallet) return;
-          const key = await delegateAddOrderlyKey(wallet);
-          setDelegateOrderlyKey(key);
+          if (!wallet || !connectedChain || !brokerId) return;
+          const key = await delegateAddOrderlyKey(wallet, connectedChain.id, brokerId, accountId);
+          setOrderlyKey(key);
         }}
       >
         Create Delegate Orderly Key
