@@ -1,4 +1,4 @@
-import{aY as t,af as n,b0 as e,b1 as i,b3 as s,aZ as f,b2 as d,a$ as c,a_ as l}from"./index-a132TJQB.js";const a=`
+import{aY as t,af as n,b0 as e,b1 as i,b3 as s,aZ as f,b2 as d,a$ as c,a_ as l}from"./index--YcYzxj0.js";const a=`
 @font-face {
   font-family: 'Inter';
   font-style:  normal;
