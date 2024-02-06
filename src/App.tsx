@@ -28,7 +28,7 @@ function App() {
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
   const [orderlyKey, setOrderlyKey] = useState<Uint8Array>();
 
-  const [{ wallet }, connectWallet] = useConnectWallet();
+  const [{ wallet }, connectWallet, disconnectWallet] = useConnectWallet();
   const [{ connectedChain }, setChain] = useSetChain();
 
   useEffect(() => {
@@ -160,6 +160,14 @@ function App() {
                     style={{ marginRight: '0.3rem', height: '1.8rem' }}
                   />
                   OP Sepolia
+                </DropdownMenu.Item>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Item
+                  onSelect={() => {
+                    disconnectWallet({ label: wallet.label });
+                  }}
+                >
+                  Disconnect
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Root>
