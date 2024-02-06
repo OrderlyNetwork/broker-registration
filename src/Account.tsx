@@ -1,4 +1,4 @@
-import { Button, Callout, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
+import { Button, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { FC, useState } from 'react';
 
@@ -79,12 +79,6 @@ export const Account: FC<{
           </Text>
         )}
       </Card>
-
-      <Callout.Root>
-        <Callout.Text>
-          Delegate Signer information is not persisted on successive page visits
-        </Callout.Text>
-      </Callout.Root>
 
       {connectedChain && isTestnet(connectedChain.id) && (
         <Button

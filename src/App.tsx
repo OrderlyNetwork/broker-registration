@@ -1,4 +1,14 @@
-import { Button, Callout, Container, DropdownMenu, Flex, Tabs, TextField } from '@radix-ui/themes';
+import {
+  Button,
+  Callout,
+  Container,
+  DropdownMenu,
+  Flex,
+  Heading,
+  Tabs,
+  Text,
+  TextField
+} from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { useEffect, useState } from 'react';
 
@@ -84,7 +94,21 @@ function App() {
   };
 
   return (
-    <Flex style={{ margin: '2rem auto', maxWidth: '45rem' }} direction="column" gap="8">
+    <Flex style={{ margin: '2rem auto', maxWidth: '45rem' }} direction="column" gap="6">
+      <Heading style={{ alignSelf: 'center' }}>Orderly Delegate Signer</Heading>
+
+      <Text>
+        This app lets you connect to the Orderly Network infrastructure with a{' '}
+        <a
+          href="https://orderly.network/docs/build-on-evm/user-flows/delegate-signer"
+          target="_blank"
+          rel="noopener"
+        >
+          Delegate Signer
+        </a>{' '}
+        EOA account. You can then deposit and withdraw to your respective smart contract account.
+      </Text>
+
       <Flex gap="4" align="end" wrap="wrap">
         <Container style={{ width: '100%' }}>
           {wallet ? (
