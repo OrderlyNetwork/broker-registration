@@ -19,7 +19,6 @@ jobs:
 
       - name: Build
         run: |
-          cd sdk/hooks
           yarn install
           yarn build --base /delegate-signer
 
