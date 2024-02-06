@@ -107,6 +107,11 @@ function App() {
           Delegate Signer
         </a>{' '}
         EOA account. You can then deposit and withdraw to your respective smart contract account.
+        The source code is available on{' '}
+        <a href="https://github.com/OrderlyNetwork/delegate-signer" target="_blank" rel="noopener">
+          Github
+        </a>
+        .
       </Text>
 
       <Flex gap="4" align="end" wrap="wrap">
