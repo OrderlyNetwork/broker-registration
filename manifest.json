@@ -1,0 +1,5 @@
+{
+  "name": "Orderly Delegate Signer",
+  "description": "Interact with Orderly Network infrastructure via smart contracts",
+  "iconPath": "icon.svg"
+}
