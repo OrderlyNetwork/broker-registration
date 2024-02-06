@@ -1,6 +1,8 @@
+import { getPublicKeyAsync } from '@noble/ed25519';
 import { Button, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
-import { FC, useState } from 'react';
+import { encodeBase58 } from 'ethers';
+import { FC, useEffect, useState } from 'react';
 
 import {
   DelegateSignerResponse,
@@ -19,9 +21,21 @@ export const Account: FC<{
   setOrderlyKey: React.Dispatch<React.SetStateAction<Uint8Array | undefined>>;
 }> = ({ brokerId, accountId, delegateSigner, setDelegateSigner, orderlyKey, setOrderlyKey }) => {
   const [txHash, setTxHash] = useState<string>('');
+  const [publicKey, setPublicKey] = useState<string>();
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
+
+  useEffect(() => {
+    async function run() {
+      if (orderlyKey) {
+        setPublicKey(`ed25519:${encodeBase58(await getPublicKeyAsync(orderlyKey))}`);
+      } else {
+        setPublicKey(undefined);
+      }
+    }
+    run();
+  }, [orderlyKey]);
 
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
@@ -68,7 +82,7 @@ export const Account: FC<{
                   Orderly Key:
                 </Text>
                 <Text as="div" size="2">
-                  {orderlyKey ? 'OK' : '-'}
+                  {publicKey ?? '-'}
                 </Text>
               </Container>
             </Flex>

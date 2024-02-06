@@ -1,9 +1,11 @@
-# Orderly SDK Workshop
+# Orderly Delegate Signer
 
-This project demonstrates usage of the [Orderly hooks SDK](https://www.npmjs.com/package/@orderly.network/hooks).
+This app lets you connect to the Orderly Network infrastructure with a Delegate Signer EOA account.
+You can then deposit and withdraw to your respective smart contract account.
+
 The project has been scaffolded via Vitejs and the `react-ts` template.
 
-[Demo page](https://orderlynetwork.github.io/sdk-workshop/)
+[Demo page](https://orderlynetwork.github.io/delegate-signer/)
 
 ## Usage
 

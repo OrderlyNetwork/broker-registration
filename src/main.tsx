@@ -1,4 +1,3 @@
-import { OrderlyConfigProvider } from '@orderly.network/hooks';
 import { Theme } from '@radix-ui/themes';
 import injectedModule from '@web3-onboard/injected-wallets';
 import { Web3OnboardProvider, init } from '@web3-onboard/react';
@@ -61,9 +60,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Theme>
       <Web3OnboardProvider web3Onboard={web3Onboard}>
-        <OrderlyConfigProvider networkId="testnet" brokerId="woofi_dex">
-          <App />
-        </OrderlyConfigProvider>
+        <App />
       </Web3OnboardProvider>
     </Theme>
   </React.StrictMode>

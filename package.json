@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@noble/ed25519": "^2.0.0",
-    "@orderly.network/hooks": "1.0.28-alpha.26",
     "@orderly.network/types": "^0.1.28",
     "@radix-ui/themes": "^2.0.2",
     "@web3-onboard/injected-wallets": "^2.10.11",
