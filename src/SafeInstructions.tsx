@@ -174,15 +174,6 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                     style={{ maxWidth: '100%' }}
                   />
                 </Flex>
-
-                <Flex direction="column">
-                  <Strong>Execute transaction</Strong>
-                  <img
-                    src="./confirm-tx.webp"
-                    alt="Confirm Gnosis Safe batch transaction"
-                    style={{ maxWidth: '100%' }}
-                  />
-                </Flex>
               </Flex>
             </Tabs.Content>
           </Container>

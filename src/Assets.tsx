@@ -120,18 +120,20 @@ export const Assets: FC<{
           <Table.Row>
             <Table.RowHeaderCell>Wallet Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>
-              {balance ? formatter.format(Number(formatUnits(balance, 6))) : '-'}
+              {balance != null ? formatter.format(Number(formatUnits(balance, 6))) : '-'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.RowHeaderCell>Contract Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>
-              {contractBalance ? formatter.format(Number(formatUnits(contractBalance, 6))) : '-'}
+              {contractBalance != null
+                ? formatter.format(Number(formatUnits(contractBalance, 6)))
+                : '-'}
             </Table.Cell>
           </Table.Row>
           <Table.Row>
             <Table.RowHeaderCell>Account Balance (USDC):</Table.RowHeaderCell>
-            <Table.Cell>{vaultBalance ? String(vaultBalance) : '-'}</Table.Cell>
+            <Table.Cell>{vaultBalance != null ? String(vaultBalance) : '-'}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table.Root>
@@ -185,6 +187,7 @@ export const Assets: FC<{
                 wallet,
                 connectedChain.id,
                 brokerId,
+                contractAddress,
                 amountBN.toString(),
                 contractAddress,
                 accountId
@@ -213,6 +216,7 @@ export const Assets: FC<{
               wallet,
               connectedChain.id,
               brokerId,
+              contractAddress,
               accountId,
               orderlyKey,
               amountBN.toString(),

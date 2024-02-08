@@ -260,6 +260,7 @@ function App() {
             <Account
               brokerId={brokerId}
               accountId={accountId}
+              contractAddress={contractAddress}
               delegateSigner={delegateSigner}
               setDelegateSigner={setDelegateSigner}
               orderlyKey={orderlyKey}

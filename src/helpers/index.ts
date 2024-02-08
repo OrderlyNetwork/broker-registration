@@ -79,7 +79,7 @@ export type DelegateSignerResponse = {
   valid_signer: string;
 };
 
-export async function registerDelegateSigner(
+export async function registerExampleDelegateSigner(
   wallet: WalletState,
   brokerId: string,
   chainId: string,
@@ -99,6 +99,7 @@ export async function announceDelegateSigner(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
+  delegateContract: string,
   txHash: ethers.BytesLike
 ): Promise<DelegateSignerResponse> {
   const nonceRes = await fetch(`${getBaseUrl(chainId)}/v1/registration_nonce`);
@@ -106,7 +107,7 @@ export async function announceDelegateSigner(
   const registrationNonce = nonceJson.data.registration_nonce as string;
 
   const delegateSignerMessage = {
-    delegateContract: exampleDelegateContract,
+    delegateContract,
     brokerId,
     chainId: Number(chainId),
     timestamp: Date.now(),
@@ -144,13 +145,14 @@ export async function delegateAddOrderlyKey(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
+  delegateContract: string,
   accountId: string
 ): Promise<Uint8Array> {
   const privateKey = utils.randomPrivateKey();
   const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
   const timestamp = Date.now();
   const addKeyMessage = {
-    delegateContract: exampleDelegateContract,
+    delegateContract,
     brokerId,
     chainId: Number(chainId),
     orderlyKey,
@@ -193,6 +195,7 @@ export async function delegateDeposit(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
+  delegateContract: string,
   amount: string,
   contractAddress: string,
   accountId: string
@@ -209,13 +212,14 @@ export async function delegateDeposit(
   } satisfies VaultTypes.VaultDepositFEStruct;
   const depositFee = await contract.getDepositFee(contractAddress, depositInput);
 
-  await contract.depositTo(exampleDelegateContract, depositInput, { value: depositFee });
+  await contract.depositTo(delegateContract, depositInput, { value: depositFee });
 }
 
 export async function delegateWithdraw(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
+  delegateContract: string,
   accountId: string,
   orderlyKey: Uint8Array,
   amount: string,
@@ -230,7 +234,7 @@ export async function delegateWithdraw(
   const withdrawNonce = nonceJson.data.withdraw_nonce as string;
 
   const delegateWithdrawMessage = {
-    delegateContract: exampleDelegateContract,
+    delegateContract,
     brokerId,
     chainId: Number(chainId),
     receiver,
@@ -272,6 +276,7 @@ export async function delegateSettlePnL(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
+  delegateContract: string,
   accountId: string,
   orderlyKey: Uint8Array
 ): Promise<void> {
@@ -284,7 +289,7 @@ export async function delegateSettlePnL(
   const settleNonce = nonceJson.data.settle_nonce as string;
 
   const delegateSettlePnLMessage = {
-    delegateContract: exampleDelegateContract,
+    delegateContract,
     brokerId,
     chainId: Number(chainId),
     timestamp: Date.now(),

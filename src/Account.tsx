@@ -9,18 +9,27 @@ import {
   DelegateSignerResponse,
   announceDelegateSigner,
   delegateAddOrderlyKey,
-  registerDelegateSigner,
+  registerExampleDelegateSigner,
   isTestnet
 } from './helpers';
 
 export const Account: FC<{
   brokerId: string;
   accountId: string;
+  contractAddress: string;
   delegateSigner?: DelegateSignerResponse;
   setDelegateSigner: React.Dispatch<React.SetStateAction<DelegateSignerResponse | undefined>>;
   orderlyKey?: Uint8Array;
   setOrderlyKey: React.Dispatch<React.SetStateAction<Uint8Array | undefined>>;
-}> = ({ brokerId, accountId, delegateSigner, setDelegateSigner, orderlyKey, setOrderlyKey }) => {
+}> = ({
+  brokerId,
+  accountId,
+  contractAddress,
+  delegateSigner,
+  setDelegateSigner,
+  orderlyKey,
+  setOrderlyKey
+}) => {
   const [txHash, setTxHash] = useState<string>('');
   const [publicKey, setPublicKey] = useState<string>();
 
@@ -101,7 +110,12 @@ export const Account: FC<{
           onClick={async () => {
             const address = wallet?.accounts[0]?.address;
             if (!wallet || !connectedChain || !address) return;
-            const hash = await registerDelegateSigner(wallet, brokerId, connectedChain.id, address);
+            const hash = await registerExampleDelegateSigner(
+              wallet,
+              brokerId,
+              connectedChain.id,
+              address
+            );
             setTxHash(hash);
           }}
         >
@@ -127,7 +141,13 @@ export const Account: FC<{
           disabled={!wallet || !connectedChain || !brokerId || !txHash}
           onClick={async () => {
             if (!wallet || !connectedChain || !brokerId || !txHash) return;
-            const res = await announceDelegateSigner(wallet, connectedChain.id, brokerId, txHash);
+            const res = await announceDelegateSigner(
+              wallet,
+              connectedChain.id,
+              brokerId,
+              contractAddress,
+              txHash
+            );
             setDelegateSigner(res);
           }}
         >
@@ -139,7 +159,13 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          const key = await delegateAddOrderlyKey(wallet, connectedChain.id, brokerId, accountId);
+          const key = await delegateAddOrderlyKey(
+            wallet,
+            connectedChain.id,
+            brokerId,
+            contractAddress,
+            accountId
+          );
           setOrderlyKey(key);
         }}
       >
