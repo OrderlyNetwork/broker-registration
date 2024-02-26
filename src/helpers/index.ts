@@ -313,7 +313,8 @@ export async function delegateSettlePnL(
       body: JSON.stringify({
         message: delegateSettlePnLMessage,
         signature,
-        userAddress: wallet.accounts[0].address
+        userAddress: wallet.accounts[0].address,
+        verifyingContract: getVerifyingAddress(chainId)
       })
     }
   );

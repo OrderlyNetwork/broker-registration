@@ -278,7 +278,7 @@ function App() {
         </Tabs.Root>
       ) : (
         <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
-          <Callout.Text>Please insert your Broker ID and Contract Address</Callout.Text>
+          <Callout.Text>Please insert your Broker ID and Contract Address.</Callout.Text>
         </Callout.Root>
       )}
     </Flex>

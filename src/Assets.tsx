@@ -9,7 +9,8 @@ import {
   getVaultAddress,
   delegateDeposit,
   delegateWithdraw,
-  getClientHolding
+  getClientHolding,
+  delegateSettlePnL
 } from './helpers';
 
 export const Assets: FC<{
@@ -227,21 +228,22 @@ export const Assets: FC<{
           Withdraw from Contract
         </Button>
 
-        {/* <Button
-          disabled={!delegateSigner || !wallet || !connectedChain || !brokerId || !orderlyKey}
+        <Button
+          disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
           onClick={async () => {
-            if (!delegateSigner || !wallet || !connectedChain || !brokerId || !orderlyKey) return;
+            if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
             await delegateSettlePnL(
               wallet,
               connectedChain.id,
               brokerId,
-              delegateSigner.account_id,
+              contractAddress,
+              accountId,
               orderlyKey
             );
           }}
         >
           Settle Delegate PnL
-        </Button> */}
+        </Button>
       </Flex>
     </Flex>
   );
