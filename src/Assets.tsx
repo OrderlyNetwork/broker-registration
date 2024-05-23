@@ -140,17 +140,16 @@ export const Assets: FC<{
       </Table.Root>
 
       <Flex direction="column" gap="4">
-        <TextField.Root style={{ gridArea: 'input' }}>
-          <TextField.Input
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="USDC amount"
-            onChange={(event) => {
-              setAmount(event.target.value);
-            }}
-          />
-        </TextField.Root>
+        <TextField.Root
+          style={{ gridArea: 'input' }}
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="USDC amount"
+          onChange={(event) => {
+            setAmount(event.target.value);
+          }}
+        />
 
         <Button
           disabled={

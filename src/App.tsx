@@ -94,7 +94,11 @@ function App() {
   };
 
   return (
-    <Flex style={{ margin: '2rem auto', maxWidth: '45rem' }} direction="column" gap="6">
+    <Flex
+      style={{ padding: '2rem 0', margin: '0 auto', maxWidth: '45rem' }}
+      direction="column"
+      gap="6"
+    >
       <Heading style={{ alignSelf: 'center' }}>Orderly Delegate Signer</Heading>
 
       <Text>
@@ -214,26 +218,22 @@ function App() {
 
         <label>
           Broker ID
-          <TextField.Root>
-            <TextField.Input
-              value={brokerId}
-              onChange={(event) => {
-                setBrokerId(event.target.value);
-              }}
-            />
-          </TextField.Root>
+          <TextField.Root
+            value={brokerId}
+            onChange={(event) => {
+              setBrokerId(event.target.value);
+            }}
+          />
         </label>
 
         <label>
           Contract Address
-          <TextField.Root>
-            <TextField.Input
-              value={contractAddress}
-              onChange={(event) => {
-                setContractAddress(event.target.value);
-              }}
-            />
-          </TextField.Root>
+          <TextField.Root
+            value={contractAddress}
+            onChange={(event) => {
+              setContractAddress(event.target.value);
+            }}
+          />
         </label>
 
         <Button

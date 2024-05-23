@@ -128,14 +128,12 @@ export const Account: FC<{
       <Flex direction="column" gap="1">
         <label>
           Transaction Hash
-          <TextField.Root>
-            <TextField.Input
-              value={txHash}
-              onChange={(event) => {
-                setTxHash(event.target.value);
-              }}
-            />
-          </TextField.Root>
+          <TextField.Root
+            value={txHash}
+            onChange={(event) => {
+              setTxHash(event.target.value);
+            }}
+          />
         </label>
         <Button
           disabled={!wallet || !connectedChain || !brokerId || !txHash}
