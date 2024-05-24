@@ -78,7 +78,7 @@ export const Account: FC<{
                   Account is registered:
                 </Text>
                 <Text as="div" size="2">
-                  {isRegistered ? '✅' : '❌'}
+                  {isRegistered === true ? '✅' : isRegistered === false ? '❌' : '?'}
                 </Text>
               </Container>
               <Container>
