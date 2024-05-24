@@ -49,8 +49,8 @@ const web3Onboard = init({
     }
   ],
   appMetadata: {
-    name: 'Orderly Delegate Signer',
-    description: 'Delegate Signer functions for multisig wallets'
+    name: 'Orderly Broker Registration',
+    description: 'Register any address in Orderly Network infrastructure'
   },
   accountCenter: {
     desktop: { enabled: false },

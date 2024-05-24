@@ -100,7 +100,7 @@ function App() {
       direction="column"
       gap="6"
     >
-      <Heading style={{ alignSelf: 'center' }}>Orderly Delegate Signer</Heading>
+      <Heading style={{ alignSelf: 'center' }}>Orderly Broker Registration</Heading>
 
       <Text>
         This app lets you register an account in the Orderly Network infrastructure with any wallet
