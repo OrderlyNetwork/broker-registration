@@ -1,5 +1,5 @@
 {
-  "name": "Orderly Delegate Signer",
-  "description": "Interact with Orderly Network infrastructure via smart contracts",
+  "name": "Orderly Broker Registration",
+  "description": "Register any address in Orderly Network infrastructure",
   "iconPath": "icon.svg"
 }
