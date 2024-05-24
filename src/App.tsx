@@ -12,8 +12,8 @@ import {
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { useEffect, useState } from 'react';
 
-import { Account } from './Account';
 import { Assets } from './Assets';
+import { DelegateSigner } from './DelegateSigner';
 import Arbitrum from './assets/arbitrum.svg?raw';
 import ArbitrumSepolia from './assets/arbitrum_sepolia.svg?raw';
 import Optimism from './assets/optimism.svg?raw';
@@ -33,7 +33,7 @@ import {
 
 function App() {
   const [brokerId, setBrokerId] = useState<string>('');
-  const [contractAddress, setContractAddress] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
   const [accountId, setAccountId] = useState<string>();
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
   const [orderlyKey, setOrderlyKey] = useState<Uint8Array>();
@@ -51,13 +51,13 @@ function App() {
       setBrokerId(loadBrokerId(connectedChain.id));
       const address = loadContractAddress(connectedChain.id);
       if (!address && isTestnet(connectedChain.id)) {
-        setContractAddress(exampleDelegateContract);
+        setAddress(exampleDelegateContract);
       } else {
-        setContractAddress(address);
+        setAddress(address);
       }
     } else {
       setBrokerId('');
-      setContractAddress('');
+      setAddress('');
     }
   }, [connectedChain]);
 
@@ -102,16 +102,9 @@ function App() {
       <Heading style={{ alignSelf: 'center' }}>Orderly Delegate Signer</Heading>
 
       <Text>
-        This app lets you connect to the Orderly Network infrastructure with a{' '}
-        <a
-          href="https://orderly.network/docs/build-on-evm/user-flows/delegate-signer"
-          target="_blank"
-          rel="noopener"
-        >
-          Delegate Signer
-        </a>{' '}
-        EOA account. You can then deposit and withdraw to your respective smart contract account.
-        The source code is available on{' '}
+        This app lets you register an account in the Orderly Network infrastructure with any wallet
+        address and any broker ID. The address can be a Delegate Signer EOA account or a user
+        address. The source code is available on{' '}
         <a href="https://github.com/OrderlyNetwork/delegate-signer" target="_blank" rel="noopener">
           Github
         </a>
@@ -227,22 +220,22 @@ function App() {
         </label>
 
         <label>
-          Contract Address
+          Wallet Address
           <TextField.Root
-            value={contractAddress}
+            value={address}
             onChange={(event) => {
-              setContractAddress(event.target.value);
+              setAddress(event.target.value);
             }}
           />
         </label>
 
         <Button
-          disabled={!brokerId || !contractAddress || !connectedChain}
+          disabled={!brokerId || !address || !connectedChain}
           onClick={async () => {
-            if (!brokerId || !contractAddress || !connectedChain) return;
-            setAccountId(getAccountId(contractAddress, brokerId));
+            if (!brokerId || !address || !connectedChain) return;
+            setAccountId(getAccountId(address, brokerId));
             saveBrokerId(connectedChain.id, brokerId);
-            saveContractAddress(connectedChain.id, contractAddress);
+            saveContractAddress(connectedChain.id, address);
           }}
         >
           Load Account
@@ -250,17 +243,17 @@ function App() {
       </Flex>
 
       {accountId ? (
-        <Tabs.Root defaultValue="account">
+        <Tabs.Root defaultValue="delegate-signer">
           <Tabs.List>
-            <Tabs.Trigger value="account">Account</Tabs.Trigger>
+            <Tabs.Trigger value="delegate-signer">Delegate Signer</Tabs.Trigger>
             <Tabs.Trigger value="assets">Assets</Tabs.Trigger>
           </Tabs.List>
 
-          <Tabs.Content value="account">
-            <Account
+          <Tabs.Content value="delegate-signer">
+            <DelegateSigner
               brokerId={brokerId}
               accountId={accountId}
-              contractAddress={contractAddress}
+              contractAddress={address}
               delegateSigner={delegateSigner}
               setDelegateSigner={setDelegateSigner}
               orderlyKey={orderlyKey}
@@ -271,14 +264,14 @@ function App() {
             <Assets
               brokerId={brokerId}
               accountId={accountId}
-              contractAddress={contractAddress}
+              contractAddress={address}
               orderlyKey={orderlyKey}
             />
           </Tabs.Content>
         </Tabs.Root>
       ) : (
         <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
-          <Callout.Text>Please insert your Broker ID and Contract Address.</Callout.Text>
+          <Callout.Text>Please insert your Broker ID and Wallet Address.</Callout.Text>
         </Callout.Root>
       )}
     </Flex>

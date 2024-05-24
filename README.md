@@ -1,7 +1,7 @@
-# Orderly Delegate Signer
+# Orderly Broker Registration
 
-This app lets you connect to the Orderly Network infrastructure with a Delegate Signer EOA account.
-You can then deposit and withdraw to your respective smart contract account.
+This app lets you register an account in the Orderly Network infrastructure with any wallet address and any broker ID.
+The address can be a Delegate Signer EOA account or a user address.
 
 The project has been scaffolded via Vitejs and the `react-ts` template.
 

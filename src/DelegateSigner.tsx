@@ -13,7 +13,7 @@ import {
   isTestnet
 } from './helpers';
 
-export const Account: FC<{
+export const DelegateSigner: FC<{
   brokerId: string;
   accountId: string;
   contractAddress: string;
@@ -49,7 +49,20 @@ export const Account: FC<{
 
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
-      <Heading>Account</Heading>
+      <Heading>Delegate Signer</Heading>
+
+      <Text>
+        Here you can connect your{' '}
+        <a
+          href="https://orderly.network/docs/build-on-evm/user-flows/delegate-signer"
+          target="_blank"
+          rel="noopener"
+        >
+          Delegate Signer
+        </a>{' '}
+        EOA account to the Orderly Network infrastructure. You can then deposit and withdraw to your
+        respective smart contract account.
+      </Text>
 
       <Card style={{ maxWidth: 240 }}>
         {wallet ? (
@@ -119,7 +132,7 @@ export const Account: FC<{
             setTxHash(hash);
           }}
         >
-          Register Delegate Signer
+          Register Example Delegate Signer
         </Button>
       )}
 
