@@ -52,7 +52,7 @@ export const DelegateSigner: FC<{
       <Heading>Delegate Signer</Heading>
 
       <Text>
-        Here you can connect your{' '}
+        Here you can register your{' '}
         <a
           href="https://orderly.network/docs/build-on-evm/user-flows/delegate-signer"
           target="_blank"
@@ -60,7 +60,7 @@ export const DelegateSigner: FC<{
         >
           Delegate Signer
         </a>{' '}
-        EOA account to the Orderly Network infrastructure. You can then deposit and withdraw to your
+        EOA account in the Orderly Network infrastructure. You can then deposit and withdraw to your
         respective smart contract account.
       </Text>
 

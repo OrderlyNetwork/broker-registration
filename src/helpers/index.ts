@@ -34,6 +34,35 @@ const MESSAGE_TYPES = {
     { name: 'chainId', type: 'uint256' },
     { name: 'verifyingContract', type: 'address' }
   ],
+  Registration: [
+    { name: 'brokerId', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'timestamp', type: 'uint64' },
+    { name: 'registrationNonce', type: 'uint256' }
+  ],
+  AddOrderlyKey: [
+    { name: 'brokerId', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'orderlyKey', type: 'string' },
+    { name: 'scope', type: 'string' },
+    { name: 'timestamp', type: 'uint64' },
+    { name: 'expiration', type: 'uint64' }
+  ],
+  Withdraw: [
+    { name: 'brokerId', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'receiver', type: 'address' },
+    { name: 'token', type: 'string' },
+    { name: 'amount', type: 'uint256' },
+    { name: 'withdrawNonce', type: 'uint64' },
+    { name: 'timestamp', type: 'uint64' }
+  ],
+  SettlePnl: [
+    { name: 'brokerId', type: 'string' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'settleNonce', type: 'uint64' },
+    { name: 'timestamp', type: 'uint64' }
+  ],
   DelegateSigner: [
     { name: 'delegateContract', type: 'address' },
     { name: 'brokerId', type: 'string' },
@@ -78,6 +107,94 @@ export type DelegateSignerResponse = {
   user_id: number;
   valid_signer: string;
 };
+
+export async function registerAccount(
+  wallet: WalletState,
+  chainId: string,
+  brokerId: string
+): Promise<string> {
+  const nonceRes = await fetch(`${getBaseUrl(chainId)}/v1/registration_nonce`);
+  const nonceJson = await nonceRes.json();
+  const registrationNonce = nonceJson.data.registration_nonce as string;
+
+  const registerMessage = {
+    brokerId,
+    chainId: Number(chainId),
+    timestamp: Date.now(),
+    registrationNonce
+  };
+
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOffChainDomain(chainId),
+    {
+      Registration: MESSAGE_TYPES.Registration
+    },
+    registerMessage
+  );
+
+  const registerRes = await fetch(`${getBaseUrl(chainId)}/v1/register_account`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: registerMessage,
+      signature,
+      userAddress: wallet.accounts[0].address
+    })
+  });
+  const registerJson = await registerRes.json();
+  if (!registerJson.success) {
+    throw new Error(registerJson.message);
+  }
+  return registerJson.data.account_id;
+}
+
+export async function addOrderlyKey(
+  wallet: WalletState,
+  chainId: string,
+  brokerId: string
+): Promise<Uint8Array> {
+  const privateKey = utils.randomPrivateKey();
+  const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
+  const timestamp = Date.now();
+  const addKeyMessage = {
+    brokerId,
+    chainId: Number(chainId),
+    orderlyKey,
+    scope: 'read,trading',
+    timestamp,
+    expiration: timestamp + 1_000 * 60 * 60 * 24 * 365 // 1 year
+  };
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOffChainDomain(chainId),
+    {
+      AddOrderlyKey: MESSAGE_TYPES.AddOrderlyKey
+    },
+    addKeyMessage
+  );
+
+  const keyRes = await fetch(`${getBaseUrl(chainId)}/v1/orderly_key`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: addKeyMessage,
+      signature,
+      userAddress: wallet.accounts[0].address
+    })
+  });
+  const keyJson = await keyRes.json();
+  if (!keyJson.success) {
+    throw new Error(keyJson.message);
+  }
+  return privateKey;
+}
 
 export async function registerExampleDelegateSigner(
   wallet: WalletState,

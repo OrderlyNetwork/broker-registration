@@ -12,6 +12,7 @@ import {
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { useEffect, useState } from 'react';
 
+import { Account } from './Account';
 import { Assets } from './Assets';
 import { DelegateSigner } from './DelegateSigner';
 import Arbitrum from './assets/arbitrum.svg?raw';
@@ -215,6 +216,7 @@ function App() {
             value={brokerId}
             onChange={(event) => {
               setBrokerId(event.target.value);
+              setAccountId(undefined);
             }}
           />
         </label>
@@ -225,6 +227,7 @@ function App() {
             value={address}
             onChange={(event) => {
               setAddress(event.target.value);
+              setAccountId(undefined);
             }}
           />
         </label>
@@ -243,12 +246,21 @@ function App() {
       </Flex>
 
       {accountId ? (
-        <Tabs.Root defaultValue="delegate-signer">
+        <Tabs.Root defaultValue="account">
           <Tabs.List>
+            <Tabs.Trigger value="account">Account</Tabs.Trigger>
             <Tabs.Trigger value="delegate-signer">Delegate Signer</Tabs.Trigger>
             <Tabs.Trigger value="assets">Assets</Tabs.Trigger>
           </Tabs.List>
 
+          <Tabs.Content value="account">
+            <Account
+              brokerId={brokerId}
+              accountId={accountId}
+              orderlyKey={orderlyKey}
+              setOrderlyKey={setOrderlyKey}
+            />
+          </Tabs.Content>
           <Tabs.Content value="delegate-signer">
             <DelegateSigner
               brokerId={brokerId}
