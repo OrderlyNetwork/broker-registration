@@ -23,6 +23,8 @@ import {
 
 export * from './constants';
 
+export const usdFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+
 const ORDERLY_KEY_LOCAL_STORAGE = 'orderly-key';
 const BROKER_ID_LOCAL_STORAGE = 'broker-id';
 const CONTRACT_ADDRESS_LOCAL_STORAGE = 'contract-address';

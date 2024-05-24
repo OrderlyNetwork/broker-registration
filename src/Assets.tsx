@@ -10,7 +10,8 @@ import {
   delegateDeposit,
   delegateWithdraw,
   getClientHolding,
-  delegateSettlePnL
+  delegateSettlePnL,
+  usdFormatter
 } from './helpers';
 
 export const Assets: FC<{
@@ -23,6 +24,7 @@ export const Assets: FC<{
   const [balance, setBalance] = useState<bigint>();
   const [allowance, setAllowance] = useState<bigint>();
   const [contractBalance, setContractBalance] = useState<bigint>();
+  const [isEOA, setIsEOA] = useState(false);
   const [vaultBalance, setVaultBalance] = useState<number>();
   const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
 
@@ -37,6 +39,12 @@ export const Assets: FC<{
       // NaN
     }
   }
+
+  useEffect(() => {
+    const address = wallet?.accounts[0].address;
+    if (address == null) return;
+    setIsEOA(address.toLowerCase() !== contractAddress.toLowerCase());
+  }, [wallet, setIsEOA, contractAddress]);
 
   useEffect(() => {
     async function run() {
@@ -108,10 +116,6 @@ export const Assets: FC<{
     return () => clearInterval(interval);
   }, [connectedChain, accountId, orderlyKey]);
 
-  const formatter = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 2
-  });
-
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
       <Heading>Assets</Heading>
@@ -119,131 +123,136 @@ export const Assets: FC<{
       <Table.Root>
         <Table.Body>
           <Table.Row>
-            <Table.RowHeaderCell>Wallet Balance (USDC):</Table.RowHeaderCell>
+            <Table.RowHeaderCell>Connected Wallet Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>
-              {balance != null ? formatter.format(Number(formatUnits(balance, 6))) : '-'}
+              {balance != null ? usdFormatter.format(Number(formatUnits(balance, 6))) : '-'}
             </Table.Cell>
           </Table.Row>
+          {isEOA && (
+            <Table.Row>
+              <Table.RowHeaderCell>EOA Wallet Balance (USDC):</Table.RowHeaderCell>
+              <Table.Cell>
+                {contractBalance != null
+                  ? usdFormatter.format(Number(formatUnits(contractBalance, 6)))
+                  : '-'}
+              </Table.Cell>
+            </Table.Row>
+          )}
           <Table.Row>
-            <Table.RowHeaderCell>Contract Balance (USDC):</Table.RowHeaderCell>
+            <Table.RowHeaderCell>Orderly Account Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>
-              {contractBalance != null
-                ? formatter.format(Number(formatUnits(contractBalance, 6)))
-                : '-'}
+              {vaultBalance != null ? usdFormatter.format(vaultBalance) : '-'}
             </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.RowHeaderCell>Account Balance (USDC):</Table.RowHeaderCell>
-            <Table.Cell>{vaultBalance != null ? String(vaultBalance) : '-'}</Table.Cell>
           </Table.Row>
         </Table.Body>
       </Table.Root>
 
-      <Flex direction="column" gap="4">
-        <TextField.Root
-          style={{ gridArea: 'input' }}
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="USDC amount"
-          onChange={(event) => {
-            setAmount(event.target.value);
-          }}
-        />
-
-        <Button
-          disabled={
-            !wallet ||
-            !amount ||
-            !usdcContract ||
-            allowance == null ||
-            !connectedChain ||
-            !brokerId ||
-            !balance ||
-            balance < parseUnits(amount, 6)
-          }
-          onClick={async () => {
-            if (
+      {isEOA && (
+        <Flex direction="column" gap="4">
+          <TextField.Root
+            style={{ gridArea: 'input' }}
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="USDC amount"
+            onChange={(event) => {
+              setAmount(event.target.value);
+            }}
+          />
+          <Button
+            disabled={
               !wallet ||
               !amount ||
               !usdcContract ||
               allowance == null ||
               !connectedChain ||
               !brokerId ||
-              !balance
-            )
-              return;
-            const amountBN = parseUnits(amount, 6);
-            if (balance < amountBN) return;
-            if (allowance < amountBN) {
-              await usdcContract.approve(getVaultAddress(connectedChain.id), amountBN);
-              const allow = await usdcContract.allowance(
-                wallet.accounts[0].address,
-                getVaultAddress(connectedChain.id)
-              );
-              setAllowance(allow);
-            } else {
-              await delegateDeposit(
+              !balance ||
+              balance < parseUnits(amount, 6)
+            }
+            onClick={async () => {
+              if (
+                !wallet ||
+                !amount ||
+                !usdcContract ||
+                allowance == null ||
+                !connectedChain ||
+                !brokerId ||
+                !balance
+              )
+                return;
+              const amountBN = parseUnits(amount, 6);
+              if (balance < amountBN) return;
+              if (allowance < amountBN) {
+                await usdcContract.approve(getVaultAddress(connectedChain.id), amountBN);
+                const allow = await usdcContract.allowance(
+                  wallet.accounts[0].address,
+                  getVaultAddress(connectedChain.id)
+                );
+                setAllowance(allow);
+              } else {
+                await delegateDeposit(
+                  wallet,
+                  connectedChain.id,
+                  brokerId,
+                  contractAddress,
+                  amountBN.toString(),
+                  contractAddress,
+                  accountId
+                );
+              }
+            }}
+          >
+            {needsApproval ? 'Approve' : 'Deposit to Contract'}
+          </Button>
+
+          <Button
+            disabled={
+              !wallet ||
+              !connectedChain ||
+              !orderlyKey ||
+              !amount ||
+              !brokerId ||
+              parseUnits(String(vaultBalance), 6) < parseUnits(amount, 6) ||
+              parseUnits(amount, 6) < 2_500_000n // fee
+            }
+            onClick={async () => {
+              if (!wallet || !connectedChain || !orderlyKey || !amount) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              await delegateWithdraw(
                 wallet,
                 connectedChain.id,
                 brokerId,
                 contractAddress,
+                accountId,
+                orderlyKey,
                 amountBN.toString(),
-                contractAddress,
-                accountId
+                contractAddress
               );
-            }
-          }}
-        >
-          {needsApproval ? 'Approve' : 'Deposit to Contract'}
-        </Button>
+            }}
+          >
+            Withdraw from Contract
+          </Button>
 
-        <Button
-          disabled={
-            !wallet ||
-            !connectedChain ||
-            !orderlyKey ||
-            !amount ||
-            !brokerId ||
-            parseUnits(String(vaultBalance), 6) < parseUnits(amount, 6) ||
-            parseUnits(amount, 6) < 2_500_000n // fee
-          }
-          onClick={async () => {
-            if (!wallet || !connectedChain || !orderlyKey || !amount) return;
-            const amountBN = parseUnits(amount, 6);
-            if (parseUnits(String(vaultBalance), 6) < amountBN) return;
-            await delegateWithdraw(
-              wallet,
-              connectedChain.id,
-              brokerId,
-              contractAddress,
-              accountId,
-              orderlyKey,
-              amountBN.toString(),
-              contractAddress
-            );
-          }}
-        >
-          Withdraw from Contract
-        </Button>
-
-        <Button
-          disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
-          onClick={async () => {
-            if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
-            await delegateSettlePnL(
-              wallet,
-              connectedChain.id,
-              brokerId,
-              contractAddress,
-              accountId,
-              orderlyKey
-            );
-          }}
-        >
-          Settle Delegate PnL
-        </Button>
-      </Flex>
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
+              await delegateSettlePnL(
+                wallet,
+                connectedChain.id,
+                brokerId,
+                contractAddress,
+                accountId,
+                orderlyKey
+              );
+            }}
+          >
+            Settle Delegate PnL
+          </Button>
+        </Flex>
+      )}
     </Flex>
   );
 };
