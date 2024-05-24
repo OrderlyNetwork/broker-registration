@@ -106,7 +106,11 @@ function App() {
         This app lets you register an account in the Orderly Network infrastructure with any wallet
         address and any broker ID. The address can be a Delegate Signer EOA account or a user
         address. The source code is available on{' '}
-        <a href="https://github.com/OrderlyNetwork/delegate-signer" target="_blank" rel="noopener">
+        <a
+          href="https://github.com/OrderlyNetwork/broker-registration"
+          target="_blank"
+          rel="noopener"
+        >
           Github
         </a>
         .

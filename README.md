@@ -5,7 +5,7 @@ The address can be a Delegate Signer EOA account or a user address.
 
 The project has been scaffolded via Vitejs and the `react-ts` template.
 
-[App](https://orderlynetwork.github.io/delegate-signer/)
+[App](https://orderlynetwork.github.io/broker-registration/)
 
 ## Usage
 
