@@ -1,5 +1,5 @@
 import { getPublicKeyAsync } from '@noble/ed25519';
-import { Button, Card, Container, Flex, Heading, Text, TextField } from '@radix-ui/themes';
+import { Button, Card, Container, Flex, Heading, IconButton, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { encodeBase58 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import {
   registerExampleDelegateSigner,
   isTestnet
 } from './helpers';
+import { CopyIcon } from '@radix-ui/react-icons';
 
 export const DelegateSigner: FC<{
   brokerId: string;
@@ -46,6 +47,8 @@ export const DelegateSigner: FC<{
     }
     run();
   }, [orderlyKey]);
+
+  const privateKey = orderlyKey ? `ed25519:${encodeBase58(orderlyKey)}` : null
 
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
@@ -110,11 +113,31 @@ export const DelegateSigner: FC<{
               </Container>
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Orderly Key:
+                  Orderly Public Key:
                 </Text>
                 <Text as="div" size="2">
                   {publicKey ?? '-'}
                 </Text>
+              </Container>
+              <Container>
+                <Text as="div" size="2" weight="bold">
+                  Orderly Private Key:
+                </Text>
+                <Text as="div" size="2">
+                  {privateKey ? `${privateKey.slice(0, 12)}...${privateKey.slice(-4)}`:  '-'}
+                </Text>
+                {orderlyKey &&
+                  <IconButton
+                    size="1"
+                    variant="soft"
+                    onClick={async () => {
+                      if (privateKey == null) return
+                      navigator.clipboard.writeText(privateKey);
+                    }}
+                  >
+                    <CopyIcon height="12" />
+                  </IconButton>
+                }
               </Container>
             </Flex>
           </>
