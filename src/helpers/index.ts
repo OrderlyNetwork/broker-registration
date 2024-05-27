@@ -25,6 +25,8 @@ export * from './constants';
 
 export const usdFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
+export type Scope = 'read' | 'read,trading';
+
 const ORDERLY_KEY_LOCAL_STORAGE = 'orderly-key';
 const BROKER_ID_LOCAL_STORAGE = 'broker-id';
 const CONTRACT_ADDRESS_LOCAL_STORAGE = 'contract-address';
@@ -157,7 +159,8 @@ export async function registerAccount(
 export async function addOrderlyKey(
   wallet: WalletState,
   chainId: string,
-  brokerId: string
+  brokerId: string,
+  scope: Scope
 ): Promise<Uint8Array> {
   const privateKey = utils.randomPrivateKey();
   const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
@@ -166,7 +169,7 @@ export async function addOrderlyKey(
     brokerId,
     chainId: Number(chainId),
     orderlyKey,
-    scope: 'read,trading',
+    scope,
     timestamp,
     expiration: timestamp + 1_000 * 60 * 60 * 24 * 365 // 1 year
   };
@@ -265,7 +268,8 @@ export async function delegateAddOrderlyKey(
   chainId: string,
   brokerId: string,
   delegateContract: string,
-  accountId: string
+  accountId: string,
+  scope: Scope
 ): Promise<Uint8Array> {
   const privateKey = utils.randomPrivateKey();
   const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
@@ -275,7 +279,7 @@ export async function delegateAddOrderlyKey(
     brokerId,
     chainId: Number(chainId),
     orderlyKey,
-    scope: 'read,trading',
+    scope,
     timestamp,
     expiration: timestamp + 1_000 * 60 * 60 * 24 * 365 // 1 year
   };

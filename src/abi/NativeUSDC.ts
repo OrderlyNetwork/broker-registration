@@ -12,158 +12,134 @@ import type {
   AddressLike,
   ContractRunner,
   ContractMethod,
-  Listener,
-} from "ethers";
+  Listener
+} from 'ethers';
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
   TypedLogDescription,
   TypedListener,
-  TypedContractMethod,
-} from "./common";
+  TypedContractMethod
+} from './common';
 
 export interface NativeUSDCInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "CANCEL_AUTHORIZATION_TYPEHASH"
-      | "DOMAIN_SEPARATOR"
-      | "PERMIT_TYPEHASH"
-      | "RECEIVE_WITH_AUTHORIZATION_TYPEHASH"
-      | "TRANSFER_WITH_AUTHORIZATION_TYPEHASH"
-      | "allowance"
-      | "approve"
-      | "authorizationState"
-      | "balanceOf"
-      | "blacklist"
-      | "blacklister"
-      | "burn"
-      | "cancelAuthorization"
-      | "configureMinter"
-      | "currency"
-      | "decimals"
-      | "decreaseAllowance"
-      | "increaseAllowance"
-      | "initialize"
-      | "initializeV2"
-      | "initializeV2_1"
-      | "isBlacklisted"
-      | "isMinter"
-      | "masterMinter"
-      | "mint"
-      | "minterAllowance"
-      | "name"
-      | "nonces"
-      | "owner"
-      | "pause"
-      | "paused"
-      | "pauser"
-      | "permit"
-      | "receiveWithAuthorization"
-      | "removeMinter"
-      | "rescueERC20"
-      | "rescuer"
-      | "symbol"
-      | "totalSupply"
-      | "transfer"
-      | "transferFrom"
-      | "transferOwnership"
-      | "transferWithAuthorization"
-      | "unBlacklist"
-      | "unpause"
-      | "updateBlacklister"
-      | "updateMasterMinter"
-      | "updatePauser"
-      | "updateRescuer"
-      | "version"
+      | 'CANCEL_AUTHORIZATION_TYPEHASH'
+      | 'DOMAIN_SEPARATOR'
+      | 'PERMIT_TYPEHASH'
+      | 'RECEIVE_WITH_AUTHORIZATION_TYPEHASH'
+      | 'TRANSFER_WITH_AUTHORIZATION_TYPEHASH'
+      | 'allowance'
+      | 'approve'
+      | 'authorizationState'
+      | 'balanceOf'
+      | 'blacklist'
+      | 'blacklister'
+      | 'burn'
+      | 'cancelAuthorization'
+      | 'configureMinter'
+      | 'currency'
+      | 'decimals'
+      | 'decreaseAllowance'
+      | 'increaseAllowance'
+      | 'initialize'
+      | 'initializeV2'
+      | 'initializeV2_1'
+      | 'isBlacklisted'
+      | 'isMinter'
+      | 'masterMinter'
+      | 'mint'
+      | 'minterAllowance'
+      | 'name'
+      | 'nonces'
+      | 'owner'
+      | 'pause'
+      | 'paused'
+      | 'pauser'
+      | 'permit'
+      | 'receiveWithAuthorization'
+      | 'removeMinter'
+      | 'rescueERC20'
+      | 'rescuer'
+      | 'symbol'
+      | 'totalSupply'
+      | 'transfer'
+      | 'transferFrom'
+      | 'transferOwnership'
+      | 'transferWithAuthorization'
+      | 'unBlacklist'
+      | 'unpause'
+      | 'updateBlacklister'
+      | 'updateMasterMinter'
+      | 'updatePauser'
+      | 'updateRescuer'
+      | 'version'
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "Approval"
-      | "AuthorizationCanceled"
-      | "AuthorizationUsed"
-      | "Blacklisted"
-      | "BlacklisterChanged"
-      | "Burn"
-      | "MasterMinterChanged"
-      | "Mint"
-      | "MinterConfigured"
-      | "MinterRemoved"
-      | "OwnershipTransferred"
-      | "Pause"
-      | "PauserChanged"
-      | "RescuerChanged"
-      | "Transfer"
-      | "UnBlacklisted"
-      | "Unpause"
+      | 'Approval'
+      | 'AuthorizationCanceled'
+      | 'AuthorizationUsed'
+      | 'Blacklisted'
+      | 'BlacklisterChanged'
+      | 'Burn'
+      | 'MasterMinterChanged'
+      | 'Mint'
+      | 'MinterConfigured'
+      | 'MinterRemoved'
+      | 'OwnershipTransferred'
+      | 'Pause'
+      | 'PauserChanged'
+      | 'RescuerChanged'
+      | 'Transfer'
+      | 'UnBlacklisted'
+      | 'Unpause'
   ): EventFragment;
 
+  encodeFunctionData(functionFragment: 'CANCEL_AUTHORIZATION_TYPEHASH', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'DOMAIN_SEPARATOR', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'PERMIT_TYPEHASH', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "CANCEL_AUTHORIZATION_TYPEHASH",
+    functionFragment: 'RECEIVE_WITH_AUTHORIZATION_TYPEHASH',
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'TRANSFER_WITH_AUTHORIZATION_TYPEHASH',
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: 'allowance', values: [AddressLike, AddressLike]): string;
+  encodeFunctionData(functionFragment: 'approve', values: [AddressLike, BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "PERMIT_TYPEHASH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "RECEIVE_WITH_AUTHORIZATION_TYPEHASH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "TRANSFER_WITH_AUTHORIZATION_TYPEHASH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "allowance",
-    values: [AddressLike, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approve",
-    values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "authorizationState",
+    functionFragment: 'authorizationState',
     values: [AddressLike, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: 'balanceOf', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'blacklist', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'blacklister', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'burn', values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "balanceOf",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "blacklist",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "blacklister",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
-  encodeFunctionData(
-    functionFragment: "cancelAuthorization",
+    functionFragment: 'cancelAuthorization',
     values: [AddressLike, BytesLike, BigNumberish, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "configureMinter",
+    functionFragment: 'configureMinter',
     values: [AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "currency", values?: undefined): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'currency', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'decimals', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "decreaseAllowance",
-    values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseAllowance",
+    functionFragment: 'decreaseAllowance',
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
+    functionFragment: 'increaseAllowance',
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'initialize',
     values: [
       string,
       string,
@@ -175,42 +151,21 @@ export interface NativeUSDCInterface extends Interface {
       AddressLike
     ]
   ): string;
+  encodeFunctionData(functionFragment: 'initializeV2', values: [string]): string;
+  encodeFunctionData(functionFragment: 'initializeV2_1', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'isBlacklisted', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'isMinter', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'masterMinter', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'mint', values: [AddressLike, BigNumberish]): string;
+  encodeFunctionData(functionFragment: 'minterAllowance', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'name', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'nonces', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'pause', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'paused', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'pauser', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "initializeV2",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "initializeV2_1",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isBlacklisted",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isMinter",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "masterMinter",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "mint",
-    values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "minterAllowance",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
-  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-  encodeFunctionData(functionFragment: "pauser", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "permit",
+    functionFragment: 'permit',
     values: [
       AddressLike,
       AddressLike,
@@ -222,7 +177,7 @@ export interface NativeUSDCInterface extends Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "receiveWithAuthorization",
+    functionFragment: 'receiveWithAuthorization',
     values: [
       AddressLike,
       AddressLike,
@@ -235,34 +190,22 @@ export interface NativeUSDCInterface extends Interface {
       BytesLike
     ]
   ): string;
+  encodeFunctionData(functionFragment: 'removeMinter', values: [AddressLike]): string;
   encodeFunctionData(
-    functionFragment: "removeMinter",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rescueERC20",
+    functionFragment: 'rescueERC20',
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "rescuer", values?: undefined): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'rescuer', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'symbol', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'totalSupply', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'transfer', values: [AddressLike, BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transfer",
-    values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferFrom",
+    functionFragment: 'transferFrom',
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: 'transferOwnership', values: [AddressLike]): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferWithAuthorization",
+    functionFragment: 'transferWithAuthorization',
     values: [
       AddressLike,
       AddressLike,
@@ -275,171 +218,74 @@ export interface NativeUSDCInterface extends Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: "unBlacklist",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "updateBlacklister",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateMasterMinter",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updatePauser",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateRescuer",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(functionFragment: "version", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'unBlacklist', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'unpause', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'updateBlacklister', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'updateMasterMinter', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'updatePauser', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'updateRescuer', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'version', values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: 'CANCEL_AUTHORIZATION_TYPEHASH', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'DOMAIN_SEPARATOR', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'PERMIT_TYPEHASH', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "CANCEL_AUTHORIZATION_TYPEHASH",
+    functionFragment: 'RECEIVE_WITH_AUTHORIZATION_TYPEHASH',
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
+    functionFragment: 'TRANSFER_WITH_AUTHORIZATION_TYPEHASH',
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "PERMIT_TYPEHASH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "RECEIVE_WITH_AUTHORIZATION_TYPEHASH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "TRANSFER_WITH_AUTHORIZATION_TYPEHASH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "authorizationState",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "blacklist", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "blacklister",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelAuthorization",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "configureMinter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "currency", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "decreaseAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "initializeV2",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "initializeV2_1",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isBlacklisted",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "isMinter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "masterMinter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "minterAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pauser", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "receiveWithAuthorization",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeMinter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "rescueERC20",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "rescuer", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupply",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferWithAuthorization",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "unBlacklist",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "updateBlacklister",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateMasterMinter",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updatePauser",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateRescuer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'authorizationState', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'blacklist', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'blacklister', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'burn', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'cancelAuthorization', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'configureMinter', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'currency', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'decimals', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'decreaseAllowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'increaseAllowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initializeV2', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initializeV2_1', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'isBlacklisted', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'isMinter', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'masterMinter', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'mint', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'minterAllowance', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'nonces', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'pause', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'paused', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'pauser', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'permit', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'receiveWithAuthorization', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'removeMinter', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'rescueERC20', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'rescuer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'totalSupply', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transfer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferFrom', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferOwnership', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferWithAuthorization', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'unBlacklist', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'unpause', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'updateBlacklister', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'updateMasterMinter', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'updatePauser', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'updateRescuer', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'version', data: BytesLike): Result;
 }
 
 export namespace ApprovalEvent {
-  export type InputTuple = [
-    owner: AddressLike,
-    spender: AddressLike,
-    value: BigNumberish
-  ];
+  export type InputTuple = [owner: AddressLike, spender: AddressLike, value: BigNumberish];
   export type OutputTuple = [owner: string, spender: string, value: bigint];
   export interface OutputObject {
     owner: string;
@@ -528,11 +374,7 @@ export namespace MasterMinterChangedEvent {
 }
 
 export namespace MintEvent {
-  export type InputTuple = [
-    minter: AddressLike,
-    to: AddressLike,
-    amount: BigNumberish
-  ];
+  export type InputTuple = [minter: AddressLike, to: AddressLike, amount: BigNumberish];
   export type OutputTuple = [minter: string, to: string, amount: bigint];
   export interface OutputObject {
     minter: string;
@@ -546,10 +388,7 @@ export namespace MintEvent {
 }
 
 export namespace MinterConfiguredEvent {
-  export type InputTuple = [
-    minter: AddressLike,
-    minterAllowedAmount: BigNumberish
-  ];
+  export type InputTuple = [minter: AddressLike, minterAllowedAmount: BigNumberish];
   export type OutputTuple = [minter: string, minterAllowedAmount: bigint];
   export interface OutputObject {
     minter: string;
@@ -621,11 +460,7 @@ export namespace RescuerChangedEvent {
 }
 
 export namespace TransferEvent {
-  export type InputTuple = [
-    from: AddressLike,
-    to: AddressLike,
-    value: BigNumberish
-  ];
+  export type InputTuple = [from: AddressLike, to: AddressLike, value: BigNumberish];
   export type OutputTuple = [from: string, to: string, value: bigint];
   export interface OutputObject {
     from: string;
@@ -699,86 +534,66 @@ export interface NativeUSDC extends BaseContract {
     event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
-  CANCEL_AUTHORIZATION_TYPEHASH: TypedContractMethod<[], [string], "view">;
+  CANCEL_AUTHORIZATION_TYPEHASH: TypedContractMethod<[], [string], 'view'>;
 
-  DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
+  DOMAIN_SEPARATOR: TypedContractMethod<[], [string], 'view'>;
 
-  PERMIT_TYPEHASH: TypedContractMethod<[], [string], "view">;
+  PERMIT_TYPEHASH: TypedContractMethod<[], [string], 'view'>;
 
-  RECEIVE_WITH_AUTHORIZATION_TYPEHASH: TypedContractMethod<
-    [],
-    [string],
-    "view"
-  >;
+  RECEIVE_WITH_AUTHORIZATION_TYPEHASH: TypedContractMethod<[], [string], 'view'>;
 
-  TRANSFER_WITH_AUTHORIZATION_TYPEHASH: TypedContractMethod<
-    [],
-    [string],
-    "view"
-  >;
+  TRANSFER_WITH_AUTHORIZATION_TYPEHASH: TypedContractMethod<[], [string], 'view'>;
 
-  allowance: TypedContractMethod<
-    [owner: AddressLike, spender: AddressLike],
-    [bigint],
-    "view"
-  >;
+  allowance: TypedContractMethod<[owner: AddressLike, spender: AddressLike], [bigint], 'view'>;
 
   approve: TypedContractMethod<
     [spender: AddressLike, value: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
   authorizationState: TypedContractMethod<
     [authorizer: AddressLike, nonce: BytesLike],
     [boolean],
-    "view"
+    'view'
   >;
 
-  balanceOf: TypedContractMethod<[account: AddressLike], [bigint], "view">;
+  balanceOf: TypedContractMethod<[account: AddressLike], [bigint], 'view'>;
 
-  blacklist: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  blacklist: TypedContractMethod<[_account: AddressLike], [void], 'nonpayable'>;
 
-  blacklister: TypedContractMethod<[], [string], "view">;
+  blacklister: TypedContractMethod<[], [string], 'view'>;
 
-  burn: TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
+  burn: TypedContractMethod<[_amount: BigNumberish], [void], 'nonpayable'>;
 
   cancelAuthorization: TypedContractMethod<
-    [
-      authorizer: AddressLike,
-      nonce: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike
-    ],
+    [authorizer: AddressLike, nonce: BytesLike, v: BigNumberish, r: BytesLike, s: BytesLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   configureMinter: TypedContractMethod<
     [minter: AddressLike, minterAllowedAmount: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  currency: TypedContractMethod<[], [string], "view">;
+  currency: TypedContractMethod<[], [string], 'view'>;
 
-  decimals: TypedContractMethod<[], [bigint], "view">;
+  decimals: TypedContractMethod<[], [bigint], 'view'>;
 
   decreaseAllowance: TypedContractMethod<
     [spender: AddressLike, decrement: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
   increaseAllowance: TypedContractMethod<
     [spender: AddressLike, increment: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
   initialize: TypedContractMethod<
@@ -793,46 +608,34 @@ export interface NativeUSDC extends BaseContract {
       newOwner: AddressLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  initializeV2: TypedContractMethod<[newName: string], [void], "nonpayable">;
+  initializeV2: TypedContractMethod<[newName: string], [void], 'nonpayable'>;
 
-  initializeV2_1: TypedContractMethod<
-    [lostAndFound: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  initializeV2_1: TypedContractMethod<[lostAndFound: AddressLike], [void], 'nonpayable'>;
 
-  isBlacklisted: TypedContractMethod<
-    [_account: AddressLike],
-    [boolean],
-    "view"
-  >;
+  isBlacklisted: TypedContractMethod<[_account: AddressLike], [boolean], 'view'>;
 
-  isMinter: TypedContractMethod<[account: AddressLike], [boolean], "view">;
+  isMinter: TypedContractMethod<[account: AddressLike], [boolean], 'view'>;
 
-  masterMinter: TypedContractMethod<[], [string], "view">;
+  masterMinter: TypedContractMethod<[], [string], 'view'>;
 
-  mint: TypedContractMethod<
-    [_to: AddressLike, _amount: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
+  mint: TypedContractMethod<[_to: AddressLike, _amount: BigNumberish], [boolean], 'nonpayable'>;
 
-  minterAllowance: TypedContractMethod<[minter: AddressLike], [bigint], "view">;
+  minterAllowance: TypedContractMethod<[minter: AddressLike], [bigint], 'view'>;
 
-  name: TypedContractMethod<[], [string], "view">;
+  name: TypedContractMethod<[], [string], 'view'>;
 
-  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+  nonces: TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
 
-  owner: TypedContractMethod<[], [string], "view">;
+  owner: TypedContractMethod<[], [string], 'view'>;
 
-  pause: TypedContractMethod<[], [void], "nonpayable">;
+  pause: TypedContractMethod<[], [void], 'nonpayable'>;
 
-  paused: TypedContractMethod<[], [boolean], "view">;
+  paused: TypedContractMethod<[], [boolean], 'view'>;
 
-  pauser: TypedContractMethod<[], [string], "view">;
+  pauser: TypedContractMethod<[], [string], 'view'>;
 
   permit: TypedContractMethod<
     [
@@ -845,7 +648,7 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   receiveWithAuthorization: TypedContractMethod<
@@ -861,44 +664,32 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  removeMinter: TypedContractMethod<
-    [minter: AddressLike],
-    [boolean],
-    "nonpayable"
-  >;
+  removeMinter: TypedContractMethod<[minter: AddressLike], [boolean], 'nonpayable'>;
 
   rescueERC20: TypedContractMethod<
     [tokenContract: AddressLike, to: AddressLike, amount: BigNumberish],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  rescuer: TypedContractMethod<[], [string], "view">;
+  rescuer: TypedContractMethod<[], [string], 'view'>;
 
-  symbol: TypedContractMethod<[], [string], "view">;
+  symbol: TypedContractMethod<[], [string], 'view'>;
 
-  totalSupply: TypedContractMethod<[], [bigint], "view">;
+  totalSupply: TypedContractMethod<[], [bigint], 'view'>;
 
-  transfer: TypedContractMethod<
-    [to: AddressLike, value: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
+  transfer: TypedContractMethod<[to: AddressLike, value: BigNumberish], [boolean], 'nonpayable'>;
 
   transferFrom: TypedContractMethod<
     [from: AddressLike, to: AddressLike, value: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  transferOwnership: TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
 
   transferWithAuthorization: TypedContractMethod<
     [
@@ -913,137 +704,79 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  unBlacklist: TypedContractMethod<
-    [_account: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  unBlacklist: TypedContractMethod<[_account: AddressLike], [void], 'nonpayable'>;
 
-  unpause: TypedContractMethod<[], [void], "nonpayable">;
+  unpause: TypedContractMethod<[], [void], 'nonpayable'>;
 
-  updateBlacklister: TypedContractMethod<
-    [_newBlacklister: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  updateBlacklister: TypedContractMethod<[_newBlacklister: AddressLike], [void], 'nonpayable'>;
 
-  updateMasterMinter: TypedContractMethod<
-    [_newMasterMinter: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  updateMasterMinter: TypedContractMethod<[_newMasterMinter: AddressLike], [void], 'nonpayable'>;
 
-  updatePauser: TypedContractMethod<
-    [_newPauser: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  updatePauser: TypedContractMethod<[_newPauser: AddressLike], [void], 'nonpayable'>;
 
-  updateRescuer: TypedContractMethod<
-    [newRescuer: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  updateRescuer: TypedContractMethod<[newRescuer: AddressLike], [void], 'nonpayable'>;
 
-  version: TypedContractMethod<[], [string], "view">;
+  version: TypedContractMethod<[], [string], 'view'>;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
   getFunction(
-    nameOrSignature: "CANCEL_AUTHORIZATION_TYPEHASH"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'CANCEL_AUTHORIZATION_TYPEHASH'
+  ): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'DOMAIN_SEPARATOR'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'PERMIT_TYPEHASH'): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "DOMAIN_SEPARATOR"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'RECEIVE_WITH_AUTHORIZATION_TYPEHASH'
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "PERMIT_TYPEHASH"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'TRANSFER_WITH_AUTHORIZATION_TYPEHASH'
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "RECEIVE_WITH_AUTHORIZATION_TYPEHASH"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'allowance'
+  ): TypedContractMethod<[owner: AddressLike, spender: AddressLike], [bigint], 'view'>;
   getFunction(
-    nameOrSignature: "TRANSFER_WITH_AUTHORIZATION_TYPEHASH"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'approve'
+  ): TypedContractMethod<[spender: AddressLike, value: BigNumberish], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "allowance"
+    nameOrSignature: 'authorizationState'
+  ): TypedContractMethod<[authorizer: AddressLike, nonce: BytesLike], [boolean], 'view'>;
+  getFunction(
+    nameOrSignature: 'balanceOf'
+  ): TypedContractMethod<[account: AddressLike], [bigint], 'view'>;
+  getFunction(
+    nameOrSignature: 'blacklist'
+  ): TypedContractMethod<[_account: AddressLike], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'blacklister'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(
+    nameOrSignature: 'burn'
+  ): TypedContractMethod<[_amount: BigNumberish], [void], 'nonpayable'>;
+  getFunction(
+    nameOrSignature: 'cancelAuthorization'
   ): TypedContractMethod<
-    [owner: AddressLike, spender: AddressLike],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "approve"
-  ): TypedContractMethod<
-    [spender: AddressLike, value: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "authorizationState"
-  ): TypedContractMethod<
-    [authorizer: AddressLike, nonce: BytesLike],
-    [boolean],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "balanceOf"
-  ): TypedContractMethod<[account: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "blacklist"
-  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "blacklister"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "burn"
-  ): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "cancelAuthorization"
-  ): TypedContractMethod<
-    [
-      authorizer: AddressLike,
-      nonce: BytesLike,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike
-    ],
+    [authorizer: AddressLike, nonce: BytesLike, v: BigNumberish, r: BytesLike, s: BytesLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "configureMinter"
+    nameOrSignature: 'configureMinter'
   ): TypedContractMethod<
     [minter: AddressLike, minterAllowedAmount: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
+  getFunction(nameOrSignature: 'currency'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'decimals'): TypedContractMethod<[], [bigint], 'view'>;
   getFunction(
-    nameOrSignature: "currency"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'decreaseAllowance'
+  ): TypedContractMethod<[spender: AddressLike, decrement: BigNumberish], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "decimals"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: 'increaseAllowance'
+  ): TypedContractMethod<[spender: AddressLike, increment: BigNumberish], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "decreaseAllowance"
-  ): TypedContractMethod<
-    [spender: AddressLike, decrement: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "increaseAllowance"
-  ): TypedContractMethod<
-    [spender: AddressLike, increment: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "initialize"
+    nameOrSignature: 'initialize'
   ): TypedContractMethod<
     [
       tokenName: string,
@@ -1056,53 +789,37 @@ export interface NativeUSDC extends BaseContract {
       newOwner: AddressLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "initializeV2"
-  ): TypedContractMethod<[newName: string], [void], "nonpayable">;
+    nameOrSignature: 'initializeV2'
+  ): TypedContractMethod<[newName: string], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "initializeV2_1"
-  ): TypedContractMethod<[lostAndFound: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'initializeV2_1'
+  ): TypedContractMethod<[lostAndFound: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "isBlacklisted"
-  ): TypedContractMethod<[_account: AddressLike], [boolean], "view">;
+    nameOrSignature: 'isBlacklisted'
+  ): TypedContractMethod<[_account: AddressLike], [boolean], 'view'>;
   getFunction(
-    nameOrSignature: "isMinter"
-  ): TypedContractMethod<[account: AddressLike], [boolean], "view">;
+    nameOrSignature: 'isMinter'
+  ): TypedContractMethod<[account: AddressLike], [boolean], 'view'>;
+  getFunction(nameOrSignature: 'masterMinter'): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "masterMinter"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'mint'
+  ): TypedContractMethod<[_to: AddressLike, _amount: BigNumberish], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "mint"
-  ): TypedContractMethod<
-    [_to: AddressLike, _amount: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
+    nameOrSignature: 'minterAllowance'
+  ): TypedContractMethod<[minter: AddressLike], [bigint], 'view'>;
+  getFunction(nameOrSignature: 'name'): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "minterAllowance"
-  ): TypedContractMethod<[minter: AddressLike], [bigint], "view">;
+    nameOrSignature: 'nonces'
+  ): TypedContractMethod<[owner: AddressLike], [bigint], 'view'>;
+  getFunction(nameOrSignature: 'owner'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'pause'): TypedContractMethod<[], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'paused'): TypedContractMethod<[], [boolean], 'view'>;
+  getFunction(nameOrSignature: 'pauser'): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "name"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "nonces"
-  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "pause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "paused"
-  ): TypedContractMethod<[], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "pauser"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "permit"
+    nameOrSignature: 'permit'
   ): TypedContractMethod<
     [
       owner: AddressLike,
@@ -1114,10 +831,10 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "receiveWithAuthorization"
+    nameOrSignature: 'receiveWithAuthorization'
   ): TypedContractMethod<
     [
       from: AddressLike,
@@ -1131,46 +848,36 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "removeMinter"
-  ): TypedContractMethod<[minter: AddressLike], [boolean], "nonpayable">;
+    nameOrSignature: 'removeMinter'
+  ): TypedContractMethod<[minter: AddressLike], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "rescueERC20"
+    nameOrSignature: 'rescueERC20'
   ): TypedContractMethod<
     [tokenContract: AddressLike, to: AddressLike, amount: BigNumberish],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
+  getFunction(nameOrSignature: 'rescuer'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'symbol'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'totalSupply'): TypedContractMethod<[], [bigint], 'view'>;
   getFunction(
-    nameOrSignature: "rescuer"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'transfer'
+  ): TypedContractMethod<[to: AddressLike, value: BigNumberish], [boolean], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "symbol"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "totalSupply"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "transfer"
-  ): TypedContractMethod<
-    [to: AddressLike, value: BigNumberish],
-    [boolean],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "transferFrom"
+    nameOrSignature: 'transferFrom'
   ): TypedContractMethod<
     [from: AddressLike, to: AddressLike, value: BigNumberish],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'transferOwnership'
+  ): TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "transferWithAuthorization"
+    nameOrSignature: 'transferWithAuthorization'
   ): TypedContractMethod<
     [
       from: AddressLike,
@@ -1184,144 +891,128 @@ export interface NativeUSDC extends BaseContract {
       s: BytesLike
     ],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "unBlacklist"
-  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'unBlacklist'
+  ): TypedContractMethod<[_account: AddressLike], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'unpause'): TypedContractMethod<[], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "unpause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'updateBlacklister'
+  ): TypedContractMethod<[_newBlacklister: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "updateBlacklister"
-  ): TypedContractMethod<[_newBlacklister: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'updateMasterMinter'
+  ): TypedContractMethod<[_newMasterMinter: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "updateMasterMinter"
-  ): TypedContractMethod<[_newMasterMinter: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'updatePauser'
+  ): TypedContractMethod<[_newPauser: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "updatePauser"
-  ): TypedContractMethod<[_newPauser: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "updateRescuer"
-  ): TypedContractMethod<[newRescuer: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "version"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'updateRescuer'
+  ): TypedContractMethod<[newRescuer: AddressLike], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'version'): TypedContractMethod<[], [string], 'view'>;
 
   getEvent(
-    key: "Approval"
+    key: 'Approval'
   ): TypedContractEvent<
     ApprovalEvent.InputTuple,
     ApprovalEvent.OutputTuple,
     ApprovalEvent.OutputObject
   >;
   getEvent(
-    key: "AuthorizationCanceled"
+    key: 'AuthorizationCanceled'
   ): TypedContractEvent<
     AuthorizationCanceledEvent.InputTuple,
     AuthorizationCanceledEvent.OutputTuple,
     AuthorizationCanceledEvent.OutputObject
   >;
   getEvent(
-    key: "AuthorizationUsed"
+    key: 'AuthorizationUsed'
   ): TypedContractEvent<
     AuthorizationUsedEvent.InputTuple,
     AuthorizationUsedEvent.OutputTuple,
     AuthorizationUsedEvent.OutputObject
   >;
   getEvent(
-    key: "Blacklisted"
+    key: 'Blacklisted'
   ): TypedContractEvent<
     BlacklistedEvent.InputTuple,
     BlacklistedEvent.OutputTuple,
     BlacklistedEvent.OutputObject
   >;
   getEvent(
-    key: "BlacklisterChanged"
+    key: 'BlacklisterChanged'
   ): TypedContractEvent<
     BlacklisterChangedEvent.InputTuple,
     BlacklisterChangedEvent.OutputTuple,
     BlacklisterChangedEvent.OutputObject
   >;
   getEvent(
-    key: "Burn"
-  ): TypedContractEvent<
-    BurnEvent.InputTuple,
-    BurnEvent.OutputTuple,
-    BurnEvent.OutputObject
-  >;
+    key: 'Burn'
+  ): TypedContractEvent<BurnEvent.InputTuple, BurnEvent.OutputTuple, BurnEvent.OutputObject>;
   getEvent(
-    key: "MasterMinterChanged"
+    key: 'MasterMinterChanged'
   ): TypedContractEvent<
     MasterMinterChangedEvent.InputTuple,
     MasterMinterChangedEvent.OutputTuple,
     MasterMinterChangedEvent.OutputObject
   >;
   getEvent(
-    key: "Mint"
-  ): TypedContractEvent<
-    MintEvent.InputTuple,
-    MintEvent.OutputTuple,
-    MintEvent.OutputObject
-  >;
+    key: 'Mint'
+  ): TypedContractEvent<MintEvent.InputTuple, MintEvent.OutputTuple, MintEvent.OutputObject>;
   getEvent(
-    key: "MinterConfigured"
+    key: 'MinterConfigured'
   ): TypedContractEvent<
     MinterConfiguredEvent.InputTuple,
     MinterConfiguredEvent.OutputTuple,
     MinterConfiguredEvent.OutputObject
   >;
   getEvent(
-    key: "MinterRemoved"
+    key: 'MinterRemoved'
   ): TypedContractEvent<
     MinterRemovedEvent.InputTuple,
     MinterRemovedEvent.OutputTuple,
     MinterRemovedEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred"
+    key: 'OwnershipTransferred'
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: "Pause"
-  ): TypedContractEvent<
-    PauseEvent.InputTuple,
-    PauseEvent.OutputTuple,
-    PauseEvent.OutputObject
-  >;
+    key: 'Pause'
+  ): TypedContractEvent<PauseEvent.InputTuple, PauseEvent.OutputTuple, PauseEvent.OutputObject>;
   getEvent(
-    key: "PauserChanged"
+    key: 'PauserChanged'
   ): TypedContractEvent<
     PauserChangedEvent.InputTuple,
     PauserChangedEvent.OutputTuple,
     PauserChangedEvent.OutputObject
   >;
   getEvent(
-    key: "RescuerChanged"
+    key: 'RescuerChanged'
   ): TypedContractEvent<
     RescuerChangedEvent.InputTuple,
     RescuerChangedEvent.OutputTuple,
     RescuerChangedEvent.OutputObject
   >;
   getEvent(
-    key: "Transfer"
+    key: 'Transfer'
   ): TypedContractEvent<
     TransferEvent.InputTuple,
     TransferEvent.OutputTuple,
     TransferEvent.OutputObject
   >;
   getEvent(
-    key: "UnBlacklisted"
+    key: 'UnBlacklisted'
   ): TypedContractEvent<
     UnBlacklistedEvent.InputTuple,
     UnBlacklistedEvent.OutputTuple,
     UnBlacklistedEvent.OutputObject
   >;
   getEvent(
-    key: "Unpause"
+    key: 'Unpause'
   ): TypedContractEvent<
     UnpauseEvent.InputTuple,
     UnpauseEvent.OutputTuple,
@@ -1329,7 +1020,7 @@ export interface NativeUSDC extends BaseContract {
   >;
 
   filters: {
-    "Approval(address,address,uint256)": TypedContractEvent<
+    'Approval(address,address,uint256)': TypedContractEvent<
       ApprovalEvent.InputTuple,
       ApprovalEvent.OutputTuple,
       ApprovalEvent.OutputObject
@@ -1340,7 +1031,7 @@ export interface NativeUSDC extends BaseContract {
       ApprovalEvent.OutputObject
     >;
 
-    "AuthorizationCanceled(address,bytes32)": TypedContractEvent<
+    'AuthorizationCanceled(address,bytes32)': TypedContractEvent<
       AuthorizationCanceledEvent.InputTuple,
       AuthorizationCanceledEvent.OutputTuple,
       AuthorizationCanceledEvent.OutputObject
@@ -1351,7 +1042,7 @@ export interface NativeUSDC extends BaseContract {
       AuthorizationCanceledEvent.OutputObject
     >;
 
-    "AuthorizationUsed(address,bytes32)": TypedContractEvent<
+    'AuthorizationUsed(address,bytes32)': TypedContractEvent<
       AuthorizationUsedEvent.InputTuple,
       AuthorizationUsedEvent.OutputTuple,
       AuthorizationUsedEvent.OutputObject
@@ -1362,7 +1053,7 @@ export interface NativeUSDC extends BaseContract {
       AuthorizationUsedEvent.OutputObject
     >;
 
-    "Blacklisted(address)": TypedContractEvent<
+    'Blacklisted(address)': TypedContractEvent<
       BlacklistedEvent.InputTuple,
       BlacklistedEvent.OutputTuple,
       BlacklistedEvent.OutputObject
@@ -1373,7 +1064,7 @@ export interface NativeUSDC extends BaseContract {
       BlacklistedEvent.OutputObject
     >;
 
-    "BlacklisterChanged(address)": TypedContractEvent<
+    'BlacklisterChanged(address)': TypedContractEvent<
       BlacklisterChangedEvent.InputTuple,
       BlacklisterChangedEvent.OutputTuple,
       BlacklisterChangedEvent.OutputObject
@@ -1384,18 +1075,14 @@ export interface NativeUSDC extends BaseContract {
       BlacklisterChangedEvent.OutputObject
     >;
 
-    "Burn(address,uint256)": TypedContractEvent<
+    'Burn(address,uint256)': TypedContractEvent<
       BurnEvent.InputTuple,
       BurnEvent.OutputTuple,
       BurnEvent.OutputObject
     >;
-    Burn: TypedContractEvent<
-      BurnEvent.InputTuple,
-      BurnEvent.OutputTuple,
-      BurnEvent.OutputObject
-    >;
+    Burn: TypedContractEvent<BurnEvent.InputTuple, BurnEvent.OutputTuple, BurnEvent.OutputObject>;
 
-    "MasterMinterChanged(address)": TypedContractEvent<
+    'MasterMinterChanged(address)': TypedContractEvent<
       MasterMinterChangedEvent.InputTuple,
       MasterMinterChangedEvent.OutputTuple,
       MasterMinterChangedEvent.OutputObject
@@ -1406,18 +1093,14 @@ export interface NativeUSDC extends BaseContract {
       MasterMinterChangedEvent.OutputObject
     >;
 
-    "Mint(address,address,uint256)": TypedContractEvent<
+    'Mint(address,address,uint256)': TypedContractEvent<
       MintEvent.InputTuple,
       MintEvent.OutputTuple,
       MintEvent.OutputObject
     >;
-    Mint: TypedContractEvent<
-      MintEvent.InputTuple,
-      MintEvent.OutputTuple,
-      MintEvent.OutputObject
-    >;
+    Mint: TypedContractEvent<MintEvent.InputTuple, MintEvent.OutputTuple, MintEvent.OutputObject>;
 
-    "MinterConfigured(address,uint256)": TypedContractEvent<
+    'MinterConfigured(address,uint256)': TypedContractEvent<
       MinterConfiguredEvent.InputTuple,
       MinterConfiguredEvent.OutputTuple,
       MinterConfiguredEvent.OutputObject
@@ -1428,7 +1111,7 @@ export interface NativeUSDC extends BaseContract {
       MinterConfiguredEvent.OutputObject
     >;
 
-    "MinterRemoved(address)": TypedContractEvent<
+    'MinterRemoved(address)': TypedContractEvent<
       MinterRemovedEvent.InputTuple,
       MinterRemovedEvent.OutputTuple,
       MinterRemovedEvent.OutputObject
@@ -1439,7 +1122,7 @@ export interface NativeUSDC extends BaseContract {
       MinterRemovedEvent.OutputObject
     >;
 
-    "OwnershipTransferred(address,address)": TypedContractEvent<
+    'OwnershipTransferred(address,address)': TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
@@ -1450,7 +1133,7 @@ export interface NativeUSDC extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    "Pause()": TypedContractEvent<
+    'Pause()': TypedContractEvent<
       PauseEvent.InputTuple,
       PauseEvent.OutputTuple,
       PauseEvent.OutputObject
@@ -1461,7 +1144,7 @@ export interface NativeUSDC extends BaseContract {
       PauseEvent.OutputObject
     >;
 
-    "PauserChanged(address)": TypedContractEvent<
+    'PauserChanged(address)': TypedContractEvent<
       PauserChangedEvent.InputTuple,
       PauserChangedEvent.OutputTuple,
       PauserChangedEvent.OutputObject
@@ -1472,7 +1155,7 @@ export interface NativeUSDC extends BaseContract {
       PauserChangedEvent.OutputObject
     >;
 
-    "RescuerChanged(address)": TypedContractEvent<
+    'RescuerChanged(address)': TypedContractEvent<
       RescuerChangedEvent.InputTuple,
       RescuerChangedEvent.OutputTuple,
       RescuerChangedEvent.OutputObject
@@ -1483,7 +1166,7 @@ export interface NativeUSDC extends BaseContract {
       RescuerChangedEvent.OutputObject
     >;
 
-    "Transfer(address,address,uint256)": TypedContractEvent<
+    'Transfer(address,address,uint256)': TypedContractEvent<
       TransferEvent.InputTuple,
       TransferEvent.OutputTuple,
       TransferEvent.OutputObject
@@ -1494,7 +1177,7 @@ export interface NativeUSDC extends BaseContract {
       TransferEvent.OutputObject
     >;
 
-    "UnBlacklisted(address)": TypedContractEvent<
+    'UnBlacklisted(address)': TypedContractEvent<
       UnBlacklistedEvent.InputTuple,
       UnBlacklistedEvent.OutputTuple,
       UnBlacklistedEvent.OutputObject
@@ -1505,7 +1188,7 @@ export interface NativeUSDC extends BaseContract {
       UnBlacklistedEvent.OutputObject
     >;
 
-    "Unpause()": TypedContractEvent<
+    'Unpause()': TypedContractEvent<
       UnpauseEvent.InputTuple,
       UnpauseEvent.OutputTuple,
       UnpauseEvent.OutputObject

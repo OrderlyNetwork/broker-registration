@@ -1,5 +1,16 @@
 import { getPublicKeyAsync } from '@noble/ed25519';
-import { Button, Card, Container, Flex, Heading, IconButton, Text, TextField } from '@radix-ui/themes';
+import { CopyIcon } from '@radix-ui/react-icons';
+import {
+  Button,
+  Card,
+  Container,
+  DropdownMenu,
+  Flex,
+  Heading,
+  IconButton,
+  Text,
+  TextField
+} from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { encodeBase58 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
@@ -10,9 +21,9 @@ import {
   announceDelegateSigner,
   delegateAddOrderlyKey,
   registerExampleDelegateSigner,
-  isTestnet
+  isTestnet,
+  Scope
 } from './helpers';
-import { CopyIcon } from '@radix-ui/react-icons';
 
 export const DelegateSigner: FC<{
   brokerId: string;
@@ -33,6 +44,7 @@ export const DelegateSigner: FC<{
 }) => {
   const [txHash, setTxHash] = useState<string>('');
   const [publicKey, setPublicKey] = useState<string>();
+  const [scope, setScope] = useState<Scope>('read,trading');
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -48,7 +60,7 @@ export const DelegateSigner: FC<{
     run();
   }, [orderlyKey]);
 
-  const privateKey = orderlyKey ? `ed25519:${encodeBase58(orderlyKey)}` : null
+  const privateKey = orderlyKey ? `ed25519:${encodeBase58(orderlyKey)}` : null;
 
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
@@ -124,20 +136,20 @@ export const DelegateSigner: FC<{
                   Orderly Private Key:
                 </Text>
                 <Text as="div" size="2">
-                  {privateKey ? `${privateKey.slice(0, 12)}...${privateKey.slice(-4)}`:  '-'}
+                  {privateKey ? `${privateKey.slice(0, 12)}...${privateKey.slice(-4)}` : '-'}
                 </Text>
-                {orderlyKey &&
+                {orderlyKey && (
                   <IconButton
                     size="1"
                     variant="soft"
                     onClick={async () => {
-                      if (privateKey == null) return
+                      if (privateKey == null) return;
                       navigator.clipboard.writeText(privateKey);
                     }}
                   >
                     <CopyIcon height="12" />
                   </IconButton>
-                }
+                )}
               </Container>
             </Flex>
           </>
@@ -197,6 +209,34 @@ export const DelegateSigner: FC<{
         </Button>
       </Flex>
 
+      <Flex direction="column">
+        <span>Scope:</span>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger>
+            <Button variant="soft">
+              {scope}
+              <DropdownMenu.TriggerIcon />
+            </Button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content>
+            <DropdownMenu.Item
+              onSelect={() => {
+                setScope('read');
+              }}
+            >
+              read
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                setScope('read,trading');
+              }}
+            >
+              read,trading
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </Flex>
+
       <Button
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
@@ -206,7 +246,8 @@ export const DelegateSigner: FC<{
             connectedChain.id,
             brokerId,
             contractAddress,
-            accountId
+            accountId,
+            scope
           );
           setOrderlyKey(key);
         }}

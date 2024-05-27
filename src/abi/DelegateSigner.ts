@@ -11,15 +11,15 @@ import type {
   AddressLike,
   ContractRunner,
   ContractMethod,
-  Listener,
-} from "ethers";
+  Listener
+} from 'ethers';
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
   TypedListener,
-  TypedContractMethod,
-} from "./common";
+  TypedContractMethod
+} from './common';
 
 export declare namespace VaultTypes {
   export type VaultDelegateStruct = {
@@ -27,26 +27,26 @@ export declare namespace VaultTypes {
     delegateSigner: AddressLike;
   };
 
-  export type VaultDelegateStructOutput = [
-    brokerHash: string,
-    delegateSigner: string
-  ] & { brokerHash: string; delegateSigner: string };
+  export type VaultDelegateStructOutput = [brokerHash: string, delegateSigner: string] & {
+    brokerHash: string;
+    delegateSigner: string;
+  };
 }
 
 export interface DelegateSignerInterface extends Interface {
-  getFunction(nameOrSignature: "delegate" | "execAction"): FunctionFragment;
+  getFunction(nameOrSignature: 'delegate' | 'execAction'): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "delegate",
+    functionFragment: 'delegate',
     values: [AddressLike, VaultTypes.VaultDelegateStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "execAction",
+    functionFragment: 'execAction',
     values: [AddressLike, BigNumberish, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "execAction", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'delegate', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'execAction', data: BytesLike): Result;
 }
 
 export interface DelegateSigner extends BaseContract {
@@ -88,39 +88,35 @@ export interface DelegateSigner extends BaseContract {
     event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
   delegate: TypedContractMethod<
     [vault: AddressLike, data: VaultTypes.VaultDelegateStruct],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   execAction: TypedContractMethod<
     [to: AddressLike, value: BigNumberish, action: BytesLike],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
   getFunction(
-    nameOrSignature: "delegate"
+    nameOrSignature: 'delegate'
   ): TypedContractMethod<
     [vault: AddressLike, data: VaultTypes.VaultDelegateStruct],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
   getFunction(
-    nameOrSignature: "execAction"
+    nameOrSignature: 'execAction'
   ): TypedContractMethod<
     [to: AddressLike, value: BigNumberish, action: BytesLike],
     [boolean],
-    "nonpayable"
+    'nonpayable'
   >;
 
   filters: {};

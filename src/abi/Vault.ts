@@ -12,16 +12,16 @@ import type {
   AddressLike,
   ContractRunner,
   ContractMethod,
-  Listener,
-} from "ethers";
+  Listener
+} from 'ethers';
 import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
   TypedLogDescription,
   TypedListener,
-  TypedContractMethod,
-} from "./common";
+  TypedContractMethod
+} from './common';
 
 export declare namespace VaultTypes {
   export type VaultDepositFEStruct = {
@@ -136,264 +136,138 @@ export declare namespace RebalanceTypes {
 export interface VaultInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "allowedToken"
-      | "changeTokenAddressAndAllow"
-      | "crossChainManagerAddress"
-      | "deposit"
-      | "depositFeeEnabled"
-      | "depositId"
-      | "depositTo"
-      | "emergencyPause"
-      | "emergencyUnpause"
-      | "enableDepositFee"
-      | "getAllAllowedBroker"
-      | "getAllAllowedToken"
-      | "getAllowedBroker"
-      | "getAllowedToken"
-      | "getDepositFee"
-      | "initialize"
-      | "messageTransmitterContract"
-      | "owner"
-      | "paused"
-      | "rebalanceBurn"
-      | "rebalanceMint"
-      | "renounceOwnership"
-      | "setAllowedBroker"
-      | "setAllowedToken"
-      | "setCrossChainManager"
-      | "setRebalanceMessengerContract"
-      | "setTokenMessengerContract"
-      | "tokenMessengerContract"
-      | "transferOwnership"
-      | "withdraw"
+      | 'allowedToken'
+      | 'changeTokenAddressAndAllow'
+      | 'crossChainManagerAddress'
+      | 'deposit'
+      | 'depositFeeEnabled'
+      | 'depositId'
+      | 'depositTo'
+      | 'emergencyPause'
+      | 'emergencyUnpause'
+      | 'enableDepositFee'
+      | 'getAllAllowedBroker'
+      | 'getAllAllowedToken'
+      | 'getAllowedBroker'
+      | 'getAllowedToken'
+      | 'getDepositFee'
+      | 'initialize'
+      | 'messageTransmitterContract'
+      | 'owner'
+      | 'paused'
+      | 'rebalanceBurn'
+      | 'rebalanceMint'
+      | 'renounceOwnership'
+      | 'setAllowedBroker'
+      | 'setAllowedToken'
+      | 'setCrossChainManager'
+      | 'setRebalanceMessengerContract'
+      | 'setTokenMessengerContract'
+      | 'tokenMessengerContract'
+      | 'transferOwnership'
+      | 'withdraw'
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "AccountDeposit"
-      | "AccountDepositTo"
-      | "AccountWithdraw"
-      | "ChangeCrossChainManager"
-      | "ChangeTokenAddressAndAllow"
-      | "Initialized"
-      | "OwnershipTransferred"
-      | "Paused"
-      | "SetAllowedBroker"
-      | "SetAllowedToken"
-      | "Unpaused"
+      | 'AccountDeposit'
+      | 'AccountDepositTo'
+      | 'AccountWithdraw'
+      | 'ChangeCrossChainManager'
+      | 'ChangeTokenAddressAndAllow'
+      | 'Initialized'
+      | 'OwnershipTransferred'
+      | 'Paused'
+      | 'SetAllowedBroker'
+      | 'SetAllowedToken'
+      | 'Unpaused'
   ): EventFragment;
 
+  encodeFunctionData(functionFragment: 'allowedToken', values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "allowedToken",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "changeTokenAddressAndAllow",
+    functionFragment: 'changeTokenAddressAndAllow',
     values: [BytesLike, AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: 'crossChainManagerAddress', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "crossChainManagerAddress",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "deposit",
+    functionFragment: 'deposit',
     values: [VaultTypes.VaultDepositFEStruct]
   ): string;
+  encodeFunctionData(functionFragment: 'depositFeeEnabled', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'depositId', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "depositFeeEnabled",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "depositId", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "depositTo",
+    functionFragment: 'depositTo',
     values: [AddressLike, VaultTypes.VaultDepositFEStruct]
   ): string;
+  encodeFunctionData(functionFragment: 'emergencyPause', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'emergencyUnpause', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'enableDepositFee', values: [boolean]): string;
+  encodeFunctionData(functionFragment: 'getAllAllowedBroker', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'getAllAllowedToken', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'getAllowedBroker', values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: 'getAllowedToken', values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "emergencyPause",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyUnpause",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "enableDepositFee",
-    values: [boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllAllowedBroker",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllAllowedToken",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllowedBroker",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getAllowedToken",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getDepositFee",
+    functionFragment: 'getDepositFee',
     values: [AddressLike, VaultTypes.VaultDepositFEStruct]
   ): string;
+  encodeFunctionData(functionFragment: 'initialize', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'messageTransmitterContract', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'paused', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "initialize",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "messageTransmitterContract",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "rebalanceBurn",
+    functionFragment: 'rebalanceBurn',
     values: [RebalanceTypes.RebalanceBurnCCDataStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "rebalanceMint",
+    functionFragment: 'rebalanceMint',
     values: [RebalanceTypes.RebalanceMintCCDataStruct]
   ): string;
+  encodeFunctionData(functionFragment: 'renounceOwnership', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'setAllowedBroker', values: [BytesLike, boolean]): string;
+  encodeFunctionData(functionFragment: 'setAllowedToken', values: [BytesLike, boolean]): string;
+  encodeFunctionData(functionFragment: 'setCrossChainManager', values: [AddressLike]): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setAllowedBroker",
-    values: [BytesLike, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setAllowedToken",
-    values: [BytesLike, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setCrossChainManager",
+    functionFragment: 'setRebalanceMessengerContract',
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: 'setTokenMessengerContract', values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: 'tokenMessengerContract', values?: undefined): string;
+  encodeFunctionData(functionFragment: 'transferOwnership', values: [AddressLike]): string;
   encodeFunctionData(
-    functionFragment: "setRebalanceMessengerContract",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setTokenMessengerContract",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tokenMessengerContract",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdraw",
+    functionFragment: 'withdraw',
     values: [VaultTypes.VaultWithdrawStruct]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "allowedToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "changeTokenAddressAndAllow",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "crossChainManagerAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "depositFeeEnabled",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "depositId", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "depositTo", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyPause",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyUnpause",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "enableDepositFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllAllowedBroker",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllAllowedToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllowedBroker",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAllowedToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getDepositFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "messageTransmitterContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "rebalanceBurn",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "rebalanceMint",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setAllowedBroker",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setAllowedToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setCrossChainManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRebalanceMessengerContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setTokenMessengerContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenMessengerContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'allowedToken', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'changeTokenAddressAndAllow', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'crossChainManagerAddress', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'deposit', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'depositFeeEnabled', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'depositId', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'depositTo', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'emergencyPause', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'emergencyUnpause', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'enableDepositFee', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getAllAllowedBroker', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getAllAllowedToken', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getAllowedBroker', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getAllowedToken', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getDepositFee', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'messageTransmitterContract', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'paused', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'rebalanceBurn', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'rebalanceMint', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'renounceOwnership', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setAllowedBroker', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setAllowedToken', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setCrossChainManager', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setRebalanceMessengerContract', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setTokenMessengerContract', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'tokenMessengerContract', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'transferOwnership', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'withdraw', data: BytesLike): Result;
 }
 
 export namespace AccountDepositEvent {
@@ -629,349 +503,255 @@ export interface Vault extends BaseContract {
     event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
-  allowedToken: TypedContractMethod<[arg0: BytesLike], [string], "view">;
+  allowedToken: TypedContractMethod<[arg0: BytesLike], [string], 'view'>;
 
   changeTokenAddressAndAllow: TypedContractMethod<
     [_tokenHash: BytesLike, _tokenAddress: AddressLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  crossChainManagerAddress: TypedContractMethod<[], [string], "view">;
+  crossChainManagerAddress: TypedContractMethod<[], [string], 'view'>;
 
-  deposit: TypedContractMethod<
-    [data: VaultTypes.VaultDepositFEStruct],
-    [void],
-    "payable"
-  >;
+  deposit: TypedContractMethod<[data: VaultTypes.VaultDepositFEStruct], [void], 'payable'>;
 
-  depositFeeEnabled: TypedContractMethod<[], [boolean], "view">;
+  depositFeeEnabled: TypedContractMethod<[], [boolean], 'view'>;
 
-  depositId: TypedContractMethod<[], [bigint], "view">;
+  depositId: TypedContractMethod<[], [bigint], 'view'>;
 
   depositTo: TypedContractMethod<
     [receiver: AddressLike, data: VaultTypes.VaultDepositFEStruct],
     [void],
-    "payable"
+    'payable'
   >;
 
-  emergencyPause: TypedContractMethod<[], [void], "nonpayable">;
+  emergencyPause: TypedContractMethod<[], [void], 'nonpayable'>;
 
-  emergencyUnpause: TypedContractMethod<[], [void], "nonpayable">;
+  emergencyUnpause: TypedContractMethod<[], [void], 'nonpayable'>;
 
-  enableDepositFee: TypedContractMethod<
-    [_enabled: boolean],
-    [void],
-    "nonpayable"
-  >;
+  enableDepositFee: TypedContractMethod<[_enabled: boolean], [void], 'nonpayable'>;
 
-  getAllAllowedBroker: TypedContractMethod<[], [string[]], "view">;
+  getAllAllowedBroker: TypedContractMethod<[], [string[]], 'view'>;
 
-  getAllAllowedToken: TypedContractMethod<[], [string[]], "view">;
+  getAllAllowedToken: TypedContractMethod<[], [string[]], 'view'>;
 
-  getAllowedBroker: TypedContractMethod<
-    [_brokerHash: BytesLike],
-    [boolean],
-    "view"
-  >;
+  getAllowedBroker: TypedContractMethod<[_brokerHash: BytesLike], [boolean], 'view'>;
 
-  getAllowedToken: TypedContractMethod<
-    [_tokenHash: BytesLike],
-    [string],
-    "view"
-  >;
+  getAllowedToken: TypedContractMethod<[_tokenHash: BytesLike], [string], 'view'>;
 
   getDepositFee: TypedContractMethod<
     [receiver: AddressLike, data: VaultTypes.VaultDepositFEStruct],
     [bigint],
-    "view"
+    'view'
   >;
 
-  initialize: TypedContractMethod<[], [void], "nonpayable">;
+  initialize: TypedContractMethod<[], [void], 'nonpayable'>;
 
-  messageTransmitterContract: TypedContractMethod<[], [string], "view">;
+  messageTransmitterContract: TypedContractMethod<[], [string], 'view'>;
 
-  owner: TypedContractMethod<[], [string], "view">;
+  owner: TypedContractMethod<[], [string], 'view'>;
 
-  paused: TypedContractMethod<[], [boolean], "view">;
+  paused: TypedContractMethod<[], [boolean], 'view'>;
 
   rebalanceBurn: TypedContractMethod<
     [data: RebalanceTypes.RebalanceBurnCCDataStruct],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   rebalanceMint: TypedContractMethod<
     [data: RebalanceTypes.RebalanceMintCCDataStruct],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+  renounceOwnership: TypedContractMethod<[], [void], 'nonpayable'>;
 
   setAllowedBroker: TypedContractMethod<
     [_brokerHash: BytesLike, _allowed: boolean],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   setAllowedToken: TypedContractMethod<
     [_tokenHash: BytesLike, _allowed: boolean],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   setCrossChainManager: TypedContractMethod<
     [_crossChainManagerAddress: AddressLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   setRebalanceMessengerContract: TypedContractMethod<
     [_rebalanceMessengerContract: AddressLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   setTokenMessengerContract: TypedContractMethod<
     [_tokenMessengerContract: AddressLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
-  tokenMessengerContract: TypedContractMethod<[], [string], "view">;
+  tokenMessengerContract: TypedContractMethod<[], [string], 'view'>;
 
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  transferOwnership: TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
 
-  withdraw: TypedContractMethod<
-    [data: VaultTypes.VaultWithdrawStruct],
-    [void],
-    "nonpayable"
-  >;
+  withdraw: TypedContractMethod<[data: VaultTypes.VaultWithdrawStruct], [void], 'nonpayable'>;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
   getFunction(
-    nameOrSignature: "allowedToken"
-  ): TypedContractMethod<[arg0: BytesLike], [string], "view">;
+    nameOrSignature: 'allowedToken'
+  ): TypedContractMethod<[arg0: BytesLike], [string], 'view'>;
   getFunction(
-    nameOrSignature: "changeTokenAddressAndAllow"
-  ): TypedContractMethod<
-    [_tokenHash: BytesLike, _tokenAddress: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'changeTokenAddressAndAllow'
+  ): TypedContractMethod<[_tokenHash: BytesLike, _tokenAddress: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "crossChainManagerAddress"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'crossChainManagerAddress'
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "deposit"
-  ): TypedContractMethod<
-    [data: VaultTypes.VaultDepositFEStruct],
-    [void],
-    "payable"
-  >;
+    nameOrSignature: 'deposit'
+  ): TypedContractMethod<[data: VaultTypes.VaultDepositFEStruct], [void], 'payable'>;
+  getFunction(nameOrSignature: 'depositFeeEnabled'): TypedContractMethod<[], [boolean], 'view'>;
+  getFunction(nameOrSignature: 'depositId'): TypedContractMethod<[], [bigint], 'view'>;
   getFunction(
-    nameOrSignature: "depositFeeEnabled"
-  ): TypedContractMethod<[], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "depositId"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "depositTo"
+    nameOrSignature: 'depositTo'
   ): TypedContractMethod<
     [receiver: AddressLike, data: VaultTypes.VaultDepositFEStruct],
     [void],
-    "payable"
+    'payable'
   >;
+  getFunction(nameOrSignature: 'emergencyPause'): TypedContractMethod<[], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'emergencyUnpause'): TypedContractMethod<[], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "emergencyPause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'enableDepositFee'
+  ): TypedContractMethod<[_enabled: boolean], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'getAllAllowedBroker'): TypedContractMethod<[], [string[]], 'view'>;
+  getFunction(nameOrSignature: 'getAllAllowedToken'): TypedContractMethod<[], [string[]], 'view'>;
   getFunction(
-    nameOrSignature: "emergencyUnpause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'getAllowedBroker'
+  ): TypedContractMethod<[_brokerHash: BytesLike], [boolean], 'view'>;
   getFunction(
-    nameOrSignature: "enableDepositFee"
-  ): TypedContractMethod<[_enabled: boolean], [void], "nonpayable">;
+    nameOrSignature: 'getAllowedToken'
+  ): TypedContractMethod<[_tokenHash: BytesLike], [string], 'view'>;
   getFunction(
-    nameOrSignature: "getAllAllowedBroker"
-  ): TypedContractMethod<[], [string[]], "view">;
-  getFunction(
-    nameOrSignature: "getAllAllowedToken"
-  ): TypedContractMethod<[], [string[]], "view">;
-  getFunction(
-    nameOrSignature: "getAllowedBroker"
-  ): TypedContractMethod<[_brokerHash: BytesLike], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "getAllowedToken"
-  ): TypedContractMethod<[_tokenHash: BytesLike], [string], "view">;
-  getFunction(
-    nameOrSignature: "getDepositFee"
+    nameOrSignature: 'getDepositFee'
   ): TypedContractMethod<
     [receiver: AddressLike, data: VaultTypes.VaultDepositFEStruct],
     [bigint],
-    "view"
+    'view'
   >;
+  getFunction(nameOrSignature: 'initialize'): TypedContractMethod<[], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "initialize"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'messageTransmitterContract'
+  ): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'owner'): TypedContractMethod<[], [string], 'view'>;
+  getFunction(nameOrSignature: 'paused'): TypedContractMethod<[], [boolean], 'view'>;
   getFunction(
-    nameOrSignature: "messageTransmitterContract"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'rebalanceBurn'
+  ): TypedContractMethod<[data: RebalanceTypes.RebalanceBurnCCDataStruct], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'rebalanceMint'
+  ): TypedContractMethod<[data: RebalanceTypes.RebalanceMintCCDataStruct], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'renounceOwnership'): TypedContractMethod<[], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "paused"
-  ): TypedContractMethod<[], [boolean], "view">;
+    nameOrSignature: 'setAllowedBroker'
+  ): TypedContractMethod<[_brokerHash: BytesLike, _allowed: boolean], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "rebalanceBurn"
-  ): TypedContractMethod<
-    [data: RebalanceTypes.RebalanceBurnCCDataStruct],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'setAllowedToken'
+  ): TypedContractMethod<[_tokenHash: BytesLike, _allowed: boolean], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "rebalanceMint"
-  ): TypedContractMethod<
-    [data: RebalanceTypes.RebalanceMintCCDataStruct],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'setCrossChainManager'
+  ): TypedContractMethod<[_crossChainManagerAddress: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "renounceOwnership"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'setRebalanceMessengerContract'
+  ): TypedContractMethod<[_rebalanceMessengerContract: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "setAllowedBroker"
-  ): TypedContractMethod<
-    [_brokerHash: BytesLike, _allowed: boolean],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'setTokenMessengerContract'
+  ): TypedContractMethod<[_tokenMessengerContract: AddressLike], [void], 'nonpayable'>;
+  getFunction(nameOrSignature: 'tokenMessengerContract'): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "setAllowedToken"
-  ): TypedContractMethod<
-    [_tokenHash: BytesLike, _allowed: boolean],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'transferOwnership'
+  ): TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "setCrossChainManager"
-  ): TypedContractMethod<
-    [_crossChainManagerAddress: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setRebalanceMessengerContract"
-  ): TypedContractMethod<
-    [_rebalanceMessengerContract: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setTokenMessengerContract"
-  ): TypedContractMethod<
-    [_tokenMessengerContract: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "tokenMessengerContract"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "withdraw"
-  ): TypedContractMethod<
-    [data: VaultTypes.VaultWithdrawStruct],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: 'withdraw'
+  ): TypedContractMethod<[data: VaultTypes.VaultWithdrawStruct], [void], 'nonpayable'>;
 
   getEvent(
-    key: "AccountDeposit"
+    key: 'AccountDeposit'
   ): TypedContractEvent<
     AccountDepositEvent.InputTuple,
     AccountDepositEvent.OutputTuple,
     AccountDepositEvent.OutputObject
   >;
   getEvent(
-    key: "AccountDepositTo"
+    key: 'AccountDepositTo'
   ): TypedContractEvent<
     AccountDepositToEvent.InputTuple,
     AccountDepositToEvent.OutputTuple,
     AccountDepositToEvent.OutputObject
   >;
   getEvent(
-    key: "AccountWithdraw"
+    key: 'AccountWithdraw'
   ): TypedContractEvent<
     AccountWithdrawEvent.InputTuple,
     AccountWithdrawEvent.OutputTuple,
     AccountWithdrawEvent.OutputObject
   >;
   getEvent(
-    key: "ChangeCrossChainManager"
+    key: 'ChangeCrossChainManager'
   ): TypedContractEvent<
     ChangeCrossChainManagerEvent.InputTuple,
     ChangeCrossChainManagerEvent.OutputTuple,
     ChangeCrossChainManagerEvent.OutputObject
   >;
   getEvent(
-    key: "ChangeTokenAddressAndAllow"
+    key: 'ChangeTokenAddressAndAllow'
   ): TypedContractEvent<
     ChangeTokenAddressAndAllowEvent.InputTuple,
     ChangeTokenAddressAndAllowEvent.OutputTuple,
     ChangeTokenAddressAndAllowEvent.OutputObject
   >;
   getEvent(
-    key: "Initialized"
+    key: 'Initialized'
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred"
+    key: 'OwnershipTransferred'
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: "Paused"
-  ): TypedContractEvent<
-    PausedEvent.InputTuple,
-    PausedEvent.OutputTuple,
-    PausedEvent.OutputObject
-  >;
+    key: 'Paused'
+  ): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
   getEvent(
-    key: "SetAllowedBroker"
+    key: 'SetAllowedBroker'
   ): TypedContractEvent<
     SetAllowedBrokerEvent.InputTuple,
     SetAllowedBrokerEvent.OutputTuple,
     SetAllowedBrokerEvent.OutputObject
   >;
   getEvent(
-    key: "SetAllowedToken"
+    key: 'SetAllowedToken'
   ): TypedContractEvent<
     SetAllowedTokenEvent.InputTuple,
     SetAllowedTokenEvent.OutputTuple,
     SetAllowedTokenEvent.OutputObject
   >;
   getEvent(
-    key: "Unpaused"
+    key: 'Unpaused'
   ): TypedContractEvent<
     UnpausedEvent.InputTuple,
     UnpausedEvent.OutputTuple,
@@ -979,7 +759,7 @@ export interface Vault extends BaseContract {
   >;
 
   filters: {
-    "AccountDeposit(bytes32,address,uint64,bytes32,uint128)": TypedContractEvent<
+    'AccountDeposit(bytes32,address,uint64,bytes32,uint128)': TypedContractEvent<
       AccountDepositEvent.InputTuple,
       AccountDepositEvent.OutputTuple,
       AccountDepositEvent.OutputObject
@@ -990,7 +770,7 @@ export interface Vault extends BaseContract {
       AccountDepositEvent.OutputObject
     >;
 
-    "AccountDepositTo(bytes32,address,uint64,bytes32,uint128)": TypedContractEvent<
+    'AccountDepositTo(bytes32,address,uint64,bytes32,uint128)': TypedContractEvent<
       AccountDepositToEvent.InputTuple,
       AccountDepositToEvent.OutputTuple,
       AccountDepositToEvent.OutputObject
@@ -1001,7 +781,7 @@ export interface Vault extends BaseContract {
       AccountDepositToEvent.OutputObject
     >;
 
-    "AccountWithdraw(bytes32,uint64,bytes32,address,address,bytes32,uint128,uint128)": TypedContractEvent<
+    'AccountWithdraw(bytes32,uint64,bytes32,address,address,bytes32,uint128,uint128)': TypedContractEvent<
       AccountWithdrawEvent.InputTuple,
       AccountWithdrawEvent.OutputTuple,
       AccountWithdrawEvent.OutputObject
@@ -1012,7 +792,7 @@ export interface Vault extends BaseContract {
       AccountWithdrawEvent.OutputObject
     >;
 
-    "ChangeCrossChainManager(address,address)": TypedContractEvent<
+    'ChangeCrossChainManager(address,address)': TypedContractEvent<
       ChangeCrossChainManagerEvent.InputTuple,
       ChangeCrossChainManagerEvent.OutputTuple,
       ChangeCrossChainManagerEvent.OutputObject
@@ -1023,7 +803,7 @@ export interface Vault extends BaseContract {
       ChangeCrossChainManagerEvent.OutputObject
     >;
 
-    "ChangeTokenAddressAndAllow(bytes32,address)": TypedContractEvent<
+    'ChangeTokenAddressAndAllow(bytes32,address)': TypedContractEvent<
       ChangeTokenAddressAndAllowEvent.InputTuple,
       ChangeTokenAddressAndAllowEvent.OutputTuple,
       ChangeTokenAddressAndAllowEvent.OutputObject
@@ -1034,7 +814,7 @@ export interface Vault extends BaseContract {
       ChangeTokenAddressAndAllowEvent.OutputObject
     >;
 
-    "Initialized(uint8)": TypedContractEvent<
+    'Initialized(uint8)': TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
@@ -1045,7 +825,7 @@ export interface Vault extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    "OwnershipTransferred(address,address)": TypedContractEvent<
+    'OwnershipTransferred(address,address)': TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
@@ -1056,7 +836,7 @@ export interface Vault extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    "Paused(address)": TypedContractEvent<
+    'Paused(address)': TypedContractEvent<
       PausedEvent.InputTuple,
       PausedEvent.OutputTuple,
       PausedEvent.OutputObject
@@ -1067,7 +847,7 @@ export interface Vault extends BaseContract {
       PausedEvent.OutputObject
     >;
 
-    "SetAllowedBroker(bytes32,bool)": TypedContractEvent<
+    'SetAllowedBroker(bytes32,bool)': TypedContractEvent<
       SetAllowedBrokerEvent.InputTuple,
       SetAllowedBrokerEvent.OutputTuple,
       SetAllowedBrokerEvent.OutputObject
@@ -1078,7 +858,7 @@ export interface Vault extends BaseContract {
       SetAllowedBrokerEvent.OutputObject
     >;
 
-    "SetAllowedToken(bytes32,bool)": TypedContractEvent<
+    'SetAllowedToken(bytes32,bool)': TypedContractEvent<
       SetAllowedTokenEvent.InputTuple,
       SetAllowedTokenEvent.OutputTuple,
       SetAllowedTokenEvent.OutputObject
@@ -1089,7 +869,7 @@ export interface Vault extends BaseContract {
       SetAllowedTokenEvent.OutputObject
     >;
 
-    "Unpaused(address)": TypedContractEvent<
+    'Unpaused(address)': TypedContractEvent<
       UnpausedEvent.InputTuple,
       UnpausedEvent.OutputTuple,
       UnpausedEvent.OutputObject

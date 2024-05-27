@@ -2,72 +2,69 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Interface, type ContractRunner } from "ethers";
-import type {
-  DelegateSigner,
-  DelegateSignerInterface,
-} from "../DelegateSigner";
+import { Contract, Interface, type ContractRunner } from 'ethers';
+import type { DelegateSigner, DelegateSignerInterface } from '../DelegateSigner';
 
 const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "vault",
-        type: "address",
+        internalType: 'address',
+        name: 'vault',
+        type: 'address'
       },
       {
         components: [
           {
-            internalType: "bytes32",
-            name: "brokerHash",
-            type: "bytes32",
+            internalType: 'bytes32',
+            name: 'brokerHash',
+            type: 'bytes32'
           },
           {
-            internalType: "address",
-            name: "delegateSigner",
-            type: "address",
-          },
+            internalType: 'address',
+            name: 'delegateSigner',
+            type: 'address'
+          }
         ],
-        internalType: "struct VaultTypes.VaultDelegate",
-        name: "data",
-        type: "tuple",
-      },
+        internalType: 'struct VaultTypes.VaultDelegate',
+        name: 'data',
+        type: 'tuple'
+      }
     ],
-    name: "delegate",
+    name: 'delegate',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function'
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "to",
-        type: "address",
+        internalType: 'address',
+        name: 'to',
+        type: 'address'
       },
       {
-        internalType: "uint256",
-        name: "value",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256'
       },
       {
-        internalType: "bytes",
-        name: "action",
-        type: "bytes",
-      },
+        internalType: 'bytes',
+        name: 'action',
+        type: 'bytes'
+      }
     ],
-    name: "execAction",
+    name: 'execAction',
     outputs: [
       {
-        internalType: "bool",
-        name: "success",
-        type: "bool",
-      },
+        internalType: 'bool',
+        name: 'success',
+        type: 'bool'
+      }
     ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
+    stateMutability: 'nonpayable',
+    type: 'function'
+  }
 ] as const;
 
 export class DelegateSigner__factory {
@@ -75,10 +72,7 @@ export class DelegateSigner__factory {
   static createInterface(): DelegateSignerInterface {
     return new Interface(_abi) as DelegateSignerInterface;
   }
-  static connect(
-    address: string,
-    runner?: ContractRunner | null
-  ): DelegateSigner {
+  static connect(address: string, runner?: ContractRunner | null): DelegateSigner {
     return new Contract(address, _abi, runner) as unknown as DelegateSigner;
   }
 }
