@@ -70,10 +70,18 @@ export const DelegateSigner: FC<{
             <Flex gap="1" direction="column">
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Address:
+                  Wallet Address:
                 </Text>
                 <Text as="div" size="2">
                   {wallet.accounts[0].address}
+                </Text>
+              </Container>
+              <Container>
+                <Text as="div" size="2" weight="bold">
+                  Delegate Signer Address:
+                </Text>
+                <Text as="div" size="2">
+                  {contractAddress}
                 </Text>
               </Container>
               <Container>
