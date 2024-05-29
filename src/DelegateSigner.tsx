@@ -79,7 +79,7 @@ export const DelegateSigner: FC<{
         respective smart contract account.
       </Text>
 
-      <Card style={{ maxWidth: 240 }}>
+      <Card style={{ maxWidth: 480 }}>
         {wallet ? (
           <>
             <Flex gap="1" direction="column">
@@ -127,29 +127,45 @@ export const DelegateSigner: FC<{
                 <Text as="div" size="2" weight="bold">
                   Orderly Public Key:
                 </Text>
-                <Text as="div" size="2">
-                  {publicKey ?? '-'}
-                </Text>
+                <Flex gap="2">
+                  <Text as="div" size="2">
+                    {publicKey ?? '-'}
+                  </Text>
+                  {publicKey && (
+                    <IconButton
+                      size="1"
+                      variant="soft"
+                      onClick={async () => {
+                        if (publicKey == null) return;
+                        navigator.clipboard.writeText(publicKey);
+                      }}
+                    >
+                      <CopyIcon height="12" />
+                    </IconButton>
+                  )}
+                </Flex>
               </Container>
               <Container>
                 <Text as="div" size="2" weight="bold">
                   Orderly Private Key:
                 </Text>
-                <Text as="div" size="2">
-                  {privateKey ? `${privateKey.slice(0, 12)}...${privateKey.slice(-4)}` : '-'}
-                </Text>
-                {orderlyKey && (
-                  <IconButton
-                    size="1"
-                    variant="soft"
-                    onClick={async () => {
-                      if (privateKey == null) return;
-                      navigator.clipboard.writeText(privateKey);
-                    }}
-                  >
-                    <CopyIcon height="12" />
-                  </IconButton>
-                )}
+                <Flex gap="2">
+                  <Text as="div" size="2">
+                    {privateKey ? `${privateKey.slice(0, 12)}...${privateKey.slice(-4)}` : '-'}
+                  </Text>
+                  {orderlyKey && (
+                    <IconButton
+                      size="1"
+                      variant="soft"
+                      onClick={async () => {
+                        if (privateKey == null) return;
+                        navigator.clipboard.writeText(privateKey);
+                      }}
+                    >
+                      <CopyIcon height="12" />
+                    </IconButton>
+                  )}
+                </Flex>
               </Container>
             </Flex>
           </>
