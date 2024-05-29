@@ -117,7 +117,7 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                   >
                     <CopyIcon height="12" />
                   </IconButton>
-                  <Text>This data will send your wallet address Delegate Signer EOA.</Text>
+                  <Text>This data will send your wallet address & Delegate Signer EOA.</Text>
                   <Code style={{ wordWrap: 'break-word', overflow: 'hidden' }}>
                     {JSON.stringify(data, undefined, 2)}
                   </Code>

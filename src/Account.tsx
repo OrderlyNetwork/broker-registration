@@ -62,8 +62,7 @@ export const Account: FC<{
 
       <Text>
         Here you can register your account in the Orderly Network infrastructure. This could be e.g.
-        helpful to register an admin address for your broker. Please make sure that the address is
-        not an EOA. Otherwise use the Delegate Signer feature.
+        helpful to register an admin address for your broker.
       </Text>
 
       <Card style={{ maxWidth: 240 }}>

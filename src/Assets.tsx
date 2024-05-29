@@ -18,13 +18,13 @@ export const Assets: FC<{
   brokerId: string;
   accountId: string;
   contractAddress: string;
+  showEOA: boolean;
   orderlyKey?: Uint8Array;
-}> = ({ brokerId, accountId, contractAddress, orderlyKey }) => {
+}> = ({ brokerId, accountId, contractAddress, showEOA, orderlyKey }) => {
   const [amount, setAmount] = useState<string>('');
   const [balance, setBalance] = useState<bigint>();
   const [allowance, setAllowance] = useState<bigint>();
   const [contractBalance, setContractBalance] = useState<bigint>();
-  const [isEOA, setIsEOA] = useState(false);
   const [vaultBalance, setVaultBalance] = useState<number>();
   const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
 
@@ -39,12 +39,6 @@ export const Assets: FC<{
       // NaN
     }
   }
-
-  useEffect(() => {
-    const address = wallet?.accounts[0].address;
-    if (address == null) return;
-    setIsEOA(address.toLowerCase() !== contractAddress.toLowerCase());
-  }, [wallet, setIsEOA, contractAddress]);
 
   useEffect(() => {
     async function run() {
@@ -128,9 +122,9 @@ export const Assets: FC<{
               {balance != null ? usdFormatter.format(Number(formatUnits(balance, 6))) : '-'}
             </Table.Cell>
           </Table.Row>
-          {isEOA && (
+          {!showEOA && (
             <Table.Row>
-              <Table.RowHeaderCell>EOA Wallet Balance (USDC):</Table.RowHeaderCell>
+              <Table.RowHeaderCell>Delegate Signer Balance (USDC):</Table.RowHeaderCell>
               <Table.Cell>
                 {contractBalance != null
                   ? usdFormatter.format(Number(formatUnits(contractBalance, 6)))
@@ -147,7 +141,7 @@ export const Assets: FC<{
         </Table.Body>
       </Table.Root>
 
-      {isEOA && (
+      {!showEOA && (
         <Flex direction="column" gap="4">
           <TextField.Root
             style={{ gridArea: 'input' }}

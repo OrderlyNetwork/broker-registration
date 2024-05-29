@@ -38,6 +38,8 @@ function App() {
   const [accountId, setAccountId] = useState<string>();
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
   const [orderlyKey, setOrderlyKey] = useState<Uint8Array>();
+  const [showEOA, setShowEOA] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('account');
 
   const [{ wallet }, connectWallet, disconnectWallet] = useConnectWallet();
   const [{ connectedChain }, setChain] = useSetChain();
@@ -214,47 +216,82 @@ function App() {
           )}
         </Container>
 
-        <label>
-          Broker ID
-          <TextField.Root
-            value={brokerId}
-            onChange={(event) => {
-              setBrokerId(event.target.value);
-              setAccountId(undefined);
-            }}
-          />
-        </label>
+        <Flex gap="4" align="end">
+          <label>
+            Broker ID
+            <TextField.Root
+              value={brokerId}
+              onChange={(event) => {
+                setBrokerId(event.target.value);
+                setAccountId(undefined);
+              }}
+            />
+          </label>
 
-        <label>
-          Wallet Address
-          <TextField.Root
-            value={address}
-            onChange={(event) => {
-              setAddress(event.target.value);
-              setAccountId(undefined);
+          <Button
+            disabled={!brokerId || !address || !connectedChain}
+            onClick={async () => {
+              if (!brokerId || !wallet || !connectedChain) return;
+              const userAddress = wallet.accounts[0].address;
+              if (!userAddress) return;
+              setAccountId(getAccountId(userAddress, brokerId));
+              saveBrokerId(connectedChain.id, brokerId);
+              setShowEOA(true);
+              setActiveTab('account');
             }}
-          />
-        </label>
+          >
+            Load Connected Address
+          </Button>
+        </Flex>
 
-        <Button
-          disabled={!brokerId || !address || !connectedChain}
-          onClick={async () => {
-            if (!brokerId || !address || !connectedChain) return;
-            setAccountId(getAccountId(address, brokerId));
-            saveBrokerId(connectedChain.id, brokerId);
-            saveContractAddress(connectedChain.id, address);
-          }}
-        >
-          Load Account
-        </Button>
+        <Flex gap="4" align="end">
+          <label>
+            Delegate Signer Address
+            <TextField.Root
+              value={address}
+              onChange={(event) => {
+                setAddress(event.target.value);
+                setAccountId(undefined);
+              }}
+            />
+          </label>
+
+          <Button
+            disabled={
+              !brokerId ||
+              !address ||
+              !connectedChain ||
+              address.toLowerCase() === wallet?.accounts[0].address.toLowerCase()
+            }
+            onClick={async () => {
+              if (!brokerId || !address || !connectedChain) return;
+              setAccountId(getAccountId(address, brokerId));
+              saveBrokerId(connectedChain.id, brokerId);
+              saveContractAddress(connectedChain.id, address);
+              setShowEOA(false);
+              setActiveTab('delegate-signer');
+            }}
+          >
+            Load Delegate Signer
+          </Button>
+        </Flex>
       </Flex>
 
       {accountId ? (
-        <Tabs.Root defaultValue="account">
+        <Tabs.Root value={activeTab}>
           <Tabs.List>
-            <Tabs.Trigger value="account">Account</Tabs.Trigger>
-            <Tabs.Trigger value="delegate-signer">Delegate Signer</Tabs.Trigger>
-            <Tabs.Trigger value="assets">Assets</Tabs.Trigger>
+            {showEOA ? (
+              <Tabs.Trigger value="account" onClick={() => setActiveTab('account')}>
+                Account
+              </Tabs.Trigger>
+            ) : (
+              <Tabs.Trigger value="delegate-signer" onClick={() => setActiveTab('delegate-signer')}>
+                Delegate Signer
+              </Tabs.Trigger>
+            )}
+            <Tabs.Trigger value="assets" onClick={() => setActiveTab('assets')}>
+              Assets
+            </Tabs.Trigger>
           </Tabs.List>
 
           <Tabs.Content value="account">
@@ -281,6 +318,7 @@ function App() {
               brokerId={brokerId}
               accountId={accountId}
               contractAddress={address}
+              showEOA={showEOA}
               orderlyKey={orderlyKey}
             />
           </Tabs.Content>

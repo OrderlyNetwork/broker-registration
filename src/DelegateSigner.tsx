@@ -75,7 +75,7 @@ export const DelegateSigner: FC<{
         >
           Delegate Signer
         </a>{' '}
-        EOA account in the Orderly Network infrastructure. You can then deposit and withdraw to your
+        account in the Orderly Network infrastructure. You can then deposit and withdraw to your
         respective smart contract account.
       </Text>
 

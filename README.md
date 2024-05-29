@@ -1,7 +1,7 @@
 # Orderly Broker Registration
 
 This app lets you register an account in the Orderly Network infrastructure with any wallet address and any broker ID.
-The address can be a Delegate Signer EOA account or a user address.
+The address can be a Delegate Signer account or a user EOA address.
 
 The project has been scaffolded via Vitejs and the `react-ts` template.
 
