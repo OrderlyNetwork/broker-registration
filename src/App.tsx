@@ -229,7 +229,7 @@ function App() {
           </label>
 
           <Button
-            disabled={!brokerId || !address || !connectedChain}
+            disabled={!brokerId || !connectedChain}
             onClick={async () => {
               if (!brokerId || !wallet || !connectedChain) return;
               const userAddress = wallet.accounts[0].address;
