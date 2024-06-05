@@ -22,6 +22,7 @@ import {
 } from './constants';
 
 export * from './constants';
+export * from './network';
 
 export const usdFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 

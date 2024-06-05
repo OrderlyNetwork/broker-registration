@@ -1,25 +1,11 @@
-import {
-  Button,
-  Callout,
-  Container,
-  DropdownMenu,
-  Flex,
-  Heading,
-  Tabs,
-  Text,
-  TextField
-} from '@radix-ui/themes';
+import { Button, Callout, Container, Flex, Heading, Tabs, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { useEffect, useState } from 'react';
 
 import { Account } from './Account';
 import { Assets } from './Assets';
 import { DelegateSigner } from './DelegateSigner';
-import Arbitrum from './assets/arbitrum.svg?raw';
-import ArbitrumSepolia from './assets/arbitrum_sepolia.svg?raw';
-import Optimism from './assets/optimism.svg?raw';
-import OptimismSepolia from './assets/optimism_sepolia.svg?raw';
-import Questionmark from './assets/questionmark.svg?raw';
+import { WalletConnection } from './WalletConnection';
 import {
   DelegateSignerResponse,
   exampleDelegateContract,
@@ -29,7 +15,8 @@ import {
   loadBrokerId,
   loadContractAddress,
   saveBrokerId,
-  saveContractAddress
+  saveContractAddress,
+  supportedChainIds
 } from './helpers';
 
 function App() {
@@ -41,8 +28,8 @@ function App() {
   const [showEOA, setShowEOA] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
 
-  const [{ wallet }, connectWallet, disconnectWallet] = useConnectWallet();
-  const [{ connectedChain }, setChain] = useSetChain();
+  const [{ wallet }, connectWallet] = useConnectWallet();
+  const [{ connectedChain }] = useSetChain();
 
   useEffect(() => {
     connectWallet();
@@ -72,29 +59,7 @@ function App() {
     }
   }, [accountId]);
 
-  let chainIcon;
-  switch (connectedChain?.id) {
-    case '0xa4b1':
-      chainIcon = Arbitrum;
-      break;
-    case '0xa':
-      chainIcon = Optimism;
-      break;
-    case '0x66eee':
-      chainIcon = ArbitrumSepolia;
-      break;
-    case '0xaa37dc':
-      chainIcon = OptimismSepolia;
-      break;
-    default:
-      chainIcon = Questionmark;
-  }
-
-  const selectChain = (chainId: string) => () => {
-    setChain({
-      chainId
-    });
-  };
+  const isChainSupported = supportedChainIds.includes(Number(connectedChain?.id));
 
   return (
     <Flex
@@ -120,100 +85,7 @@ function App() {
 
       <Flex gap="4" align="end" wrap="wrap">
         <Container style={{ width: '100%' }}>
-          {wallet ? (
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger>
-                <Button>
-                  <img
-                    src={`data:image/svg+xml;base64,${btoa(chainIcon)}`}
-                    style={{ marginRight: '0.3rem', height: '1.8rem' }}
-                  />
-                  {`${wallet.accounts[0].address.substring(
-                    0,
-                    6
-                  )}...${wallet.accounts[0].address.substr(-4)}`}
-                </Button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Content>
-                <DropdownMenu.Label>Mainnet</DropdownMenu.Label>
-                <DropdownMenu.Item
-                  onSelect={selectChain('0xa4b1')}
-                  style={{
-                    backgroundColor: connectedChain?.id === '0xa4b1' ? 'lightgrey' : undefined,
-                    color: connectedChain?.id === '0xa4b1' ? 'black' : undefined,
-                    fontWeight: connectedChain?.id === '0xa4b1' ? '600' : undefined
-                  }}
-                >
-                  <img
-                    src={`data:image/svg+xml;base64,${btoa(Arbitrum)}`}
-                    style={{ marginRight: '0.3rem', height: '1.8rem' }}
-                  />
-                  Arbitrum One
-                </DropdownMenu.Item>
-                <DropdownMenu.Item
-                  onSelect={selectChain('0xa')}
-                  style={{
-                    backgroundColor: connectedChain?.id === '0xa' ? 'lightgrey' : undefined,
-                    color: connectedChain?.id === '0xa' ? 'black' : undefined,
-                    fontWeight: connectedChain?.id === '0xa' ? '600' : undefined
-                  }}
-                >
-                  <img
-                    src={`data:image/svg+xml;base64,${btoa(Optimism)}`}
-                    style={{ marginRight: '0.3rem', height: '1.8rem' }}
-                  />
-                  OP Mainnet
-                </DropdownMenu.Item>
-                <DropdownMenu.Separator />
-                <DropdownMenu.Label>Testnet</DropdownMenu.Label>
-                <DropdownMenu.Item
-                  onSelect={selectChain('0x66eee')}
-                  style={{
-                    backgroundColor: connectedChain?.id === '0x66eee' ? 'lightgrey' : undefined,
-                    color: connectedChain?.id === '0x66eee' ? 'black' : undefined,
-                    fontWeight: connectedChain?.id === '0x66eee' ? '600' : undefined
-                  }}
-                >
-                  <img
-                    src={`data:image/svg+xml;base64,${btoa(ArbitrumSepolia)}`}
-                    style={{ marginRight: '0.3rem', height: '1.8rem' }}
-                  />
-                  Arbitrum Sepolia
-                </DropdownMenu.Item>
-                <DropdownMenu.Item
-                  onSelect={selectChain('0xaa37dc')}
-                  style={{
-                    backgroundColor: connectedChain?.id === '0xaa37dc' ? 'lightgrey' : undefined,
-                    color: connectedChain?.id === '0xaa37dc' ? 'black' : undefined,
-                    fontWeight: connectedChain?.id === '0xaa37dc' ? '600' : undefined
-                  }}
-                >
-                  <img
-                    src={`data:image/svg+xml;base64,${btoa(OptimismSepolia)}`}
-                    style={{ marginRight: '0.3rem', height: '1.8rem' }}
-                  />
-                  OP Sepolia
-                </DropdownMenu.Item>
-                <DropdownMenu.Separator />
-                <DropdownMenu.Item
-                  onSelect={() => {
-                    disconnectWallet({ label: wallet.label });
-                  }}
-                >
-                  Disconnect
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Root>
-          ) : (
-            <Button
-              onClick={async () => {
-                if (wallet) return;
-                await connectWallet();
-              }}
-            >
-              Connect wallet
-            </Button>
-          )}
+          <WalletConnection />
         </Container>
 
         <Flex gap="4" align="end">
@@ -229,7 +101,7 @@ function App() {
           </label>
 
           <Button
-            disabled={!brokerId || !connectedChain}
+            disabled={!brokerId || !connectedChain || !isChainSupported}
             onClick={async () => {
               if (!brokerId || !wallet || !connectedChain) return;
               const userAddress = wallet.accounts[0].address;
@@ -261,7 +133,8 @@ function App() {
               !brokerId ||
               !address ||
               !connectedChain ||
-              address.toLowerCase() === wallet?.accounts[0].address.toLowerCase()
+              address.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
+              !isChainSupported
             }
             onClick={async () => {
               if (!brokerId || !address || !connectedChain) return;
@@ -326,6 +199,12 @@ function App() {
       ) : (
         <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
           <Callout.Text>Please insert your Broker ID and Wallet Address.</Callout.Text>
+        </Callout.Root>
+      )}
+
+      {!isChainSupported && (
+        <Callout.Root variant="outline" color="red" style={{ alignSelf: 'center' }}>
+          <Callout.Text>Please connect to a supported chain.</Callout.Text>
         </Callout.Root>
       )}
     </Flex>

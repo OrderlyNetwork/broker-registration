@@ -7,6 +7,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App.tsx';
+import { supportedChains } from './helpers';
 
 import './index.css';
 import '@radix-ui/themes/styles.css';
@@ -22,32 +23,12 @@ const safe = safeModule();
 
 const web3Onboard = init({
   wallets: [injected, walletConnect, safe],
-  chains: [
-    {
-      id: '0xa4b1',
-      token: 'ETH',
-      label: 'Arbitrum One',
-      rpcUrl: 'https://arbitrum-one.publicnode.com'
-    },
-    {
-      id: '0xa',
-      token: 'ETH',
-      label: 'OP Mainnet',
-      rpcUrl: 'https://mainnet.optimism.io'
-    },
-    {
-      id: '0x66eee',
-      token: 'ETH',
-      label: 'Arbitrum Sepolia',
-      rpcUrl: 'https://arbitrum-sepolia.publicnode.com'
-    },
-    {
-      id: '0xaa37dc',
-      token: 'ETH',
-      label: 'OP Sepolia',
-      rpcUrl: 'https://optimism-sepolia.publicnode.com'
-    }
-  ],
+  chains: supportedChains.map(({ id, token, label, rpcUrl }) => ({
+    id,
+    token,
+    label,
+    rpcUrl
+  })),
   appMetadata: {
     name: 'Orderly Broker Registration',
     description: 'Register any address in Orderly Network infrastructure'
