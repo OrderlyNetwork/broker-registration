@@ -5,7 +5,7 @@ type SupportedChain = Chain & { network: 'mainnet' | 'testnet'; icon: string };
 export const supportedChains: SupportedChain[] = [
   {
     network: 'mainnet',
-    icon: '/assets/arbitrum.svg',
+    icon: './assets/arbitrum.svg',
     id: '0xa4b1',
     token: 'ETH',
     label: 'Arbitrum One',
@@ -13,7 +13,7 @@ export const supportedChains: SupportedChain[] = [
   },
   {
     network: 'mainnet',
-    icon: '/assets/optimism.svg',
+    icon: './assets/optimism.svg',
     id: '0xa',
     token: 'ETH',
     label: 'OP Mainnet',
@@ -21,7 +21,7 @@ export const supportedChains: SupportedChain[] = [
   },
   {
     network: 'mainnet',
-    icon: '/assets/base.svg',
+    icon: './assets/base.svg',
     id: '0x2105',
     token: 'ETH',
     label: 'Base',
@@ -29,7 +29,7 @@ export const supportedChains: SupportedChain[] = [
   },
   {
     network: 'testnet',
-    icon: '/assets/arbitrum_sepolia.svg',
+    icon: './assets/arbitrum_sepolia.svg',
     id: '0x66eee',
     token: 'ETH',
     label: 'Arbitrum Sepolia',
@@ -37,7 +37,7 @@ export const supportedChains: SupportedChain[] = [
   },
   {
     network: 'testnet',
-    icon: '/assets/optimism_sepolia.svg',
+    icon: './assets/optimism_sepolia.svg',
     id: '0xaa37dc',
     token: 'ETH',
     label: 'OP Sepolia',
@@ -45,7 +45,7 @@ export const supportedChains: SupportedChain[] = [
   },
   {
     network: 'testnet',
-    icon: '/assets/base_sepolia.svg',
+    icon: './assets/base_sepolia.svg',
     id: '0x14a34',
     token: 'ETH',
     label: 'Base Sepolia',
