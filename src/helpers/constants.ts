@@ -12,7 +12,10 @@ export function isTestnet(chainId: string): boolean {
   return match(chainId as SupportedChainIds)
     .with('0xa4b1', '0xa', '0x2105', () => false)
     .with('0x66eee', '0xaa37dc', '0x14a34', () => true)
-    .exhaustive();
+    .otherwise(() => {
+      console.warn(`unrecognized chainId ${chainId}`);
+      return true;
+    });
 }
 
 export function getVaultAddress(chainId: string): string {
@@ -23,7 +26,10 @@ export function getVaultAddress(chainId: string): string {
     .with('0x66eee', () => '0x0EaC556c0C2321BA25b9DC01e4e3c95aD5CDCd2f')
     .with('0xaa37dc', () => '0xEfF2896077B6ff95379EfA89Ff903598190805EC')
     .with('0x14a34', () => '0xdc7348975aE9334DbdcB944DDa9163Ba8406a0ec')
-    .exhaustive();
+    .otherwise(() => {
+      console.warn(`unrecognized chainId ${chainId}`);
+      return '';
+    });
 }
 
 export function getVerifyingAddress(chainId: string): string {
@@ -41,7 +47,7 @@ export function getUSDCAddress(chainId: string): string {
     .with('0x66eee', () => '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d')
     .with('0xaa37dc', () => '0x5fd84259d66Cd46123540766Be93DFE6D43130D7')
     .with('0x14a34', () => '0x036CbD53842c5426634e7929541eC2318f3dCF7e')
-    .exhaustive();
+    .otherwise(() => '');
 }
 
 export function getBaseUrl(chainId: string): string {
