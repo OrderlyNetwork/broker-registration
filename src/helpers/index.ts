@@ -161,7 +161,8 @@ export async function addOrderlyKey(
   wallet: WalletState,
   chainId: string,
   brokerId: string,
-  scope: Scope
+  scope: Scope,
+  accountId: string
 ): Promise<Uint8Array> {
   const privateKey = utils.randomPrivateKey();
   const orderlyKey = `ed25519:${encodeBase58(await getPublicKeyAsync(privateKey))}`;
@@ -199,6 +200,10 @@ export async function addOrderlyKey(
   if (!keyJson.success) {
     throw new Error(keyJson.message);
   }
+  window.localStorage.setItem(
+    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}`,
+    base64EncodeURL(privateKey)
+  );
   return privateKey;
 }
 

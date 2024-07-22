@@ -189,7 +189,7 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          const key = await addOrderlyKey(wallet, connectedChain.id, brokerId, scope);
+          const key = await addOrderlyKey(wallet, connectedChain.id, brokerId, scope, accountId);
           setOrderlyKey(key);
         }}
       >
