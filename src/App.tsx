@@ -21,7 +21,7 @@ import {
 
 function App() {
   const [brokerId, setBrokerId] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
+  const [contractAddress, setContractAddress] = useState<string>('');
   const [accountId, setAccountId] = useState<string>();
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
   const [orderlyKey, setOrderlyKey] = useState<Uint8Array>();
@@ -41,13 +41,11 @@ function App() {
       setBrokerId(loadBrokerId(connectedChain.id));
       const address = loadContractAddress(connectedChain.id);
       if (!address && isTestnet(connectedChain.id)) {
-        setAddress(exampleDelegateContract);
-      } else {
-        setAddress(address);
+        setContractAddress(exampleDelegateContract);
       }
     } else {
       setBrokerId('');
-      setAddress('');
+      setContractAddress('');
     }
   }, [connectedChain]);
 
@@ -120,9 +118,9 @@ function App() {
           <label>
             Delegate Signer Address
             <TextField.Root
-              value={address}
+              value={contractAddress}
               onChange={(event) => {
-                setAddress(event.target.value);
+                setContractAddress(event.target.value);
                 setAccountId(undefined);
               }}
             />
@@ -131,16 +129,16 @@ function App() {
           <Button
             disabled={
               !brokerId ||
-              !address ||
+              !contractAddress ||
               !connectedChain ||
-              address.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
+              contractAddress.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
               !isChainSupported
             }
             onClick={async () => {
-              if (!brokerId || !address || !connectedChain) return;
-              setAccountId(getAccountId(address, brokerId));
+              if (!brokerId || !contractAddress || !connectedChain) return;
+              setAccountId(getAccountId(contractAddress, brokerId));
               saveBrokerId(connectedChain.id, brokerId);
-              saveContractAddress(connectedChain.id, address);
+              saveContractAddress(connectedChain.id, contractAddress);
               setShowEOA(false);
               setActiveTab('delegate-signer');
             }}
@@ -179,7 +177,7 @@ function App() {
             <DelegateSigner
               brokerId={brokerId}
               accountId={accountId}
-              contractAddress={address}
+              contractAddress={contractAddress}
               delegateSigner={delegateSigner}
               setDelegateSigner={setDelegateSigner}
               orderlyKey={orderlyKey}
@@ -190,7 +188,7 @@ function App() {
             <Assets
               brokerId={brokerId}
               accountId={accountId}
-              contractAddress={address}
+              contractAddress={contractAddress}
               showEOA={showEOA}
               orderlyKey={orderlyKey}
             />

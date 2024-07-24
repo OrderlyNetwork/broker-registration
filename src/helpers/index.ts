@@ -345,6 +345,61 @@ export async function delegateDeposit(
   await contract.depositTo(delegateContract, depositInput, { value: depositFee });
 }
 
+export async function withdraw(
+  wallet: WalletState,
+  chainId: string,
+  brokerId: string,
+  accountId: string,
+  orderlyKey: Uint8Array,
+  amount: string,
+  receiver: string
+): Promise<void> {
+  const nonceRes = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/withdraw_nonce`
+  );
+  const nonceJson = await nonceRes.json();
+  const withdrawNonce = nonceJson.data.withdraw_nonce as string;
+
+  const withdrawMessage = {
+    brokerId,
+    chainId: Number(chainId),
+    receiver,
+    token: 'USDC',
+    amount: Number(amount),
+    timestamp: Date.now(),
+    withdrawNonce
+  };
+
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOnChainDomain(chainId),
+    { Withdraw: MESSAGE_TYPES.Withdraw },
+    withdrawMessage
+  );
+
+  const res = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/withdraw_request`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        message: withdrawMessage,
+        signature,
+        userAddress: wallet.accounts[0].address,
+        verifyingContract: getVerifyingAddress(chainId)
+      })
+    }
+  );
+  const withdrawJson = await res.json();
+  if (!withdrawJson.success) {
+    throw new Error(withdrawJson.message);
+  }
+}
+
 export async function delegateWithdraw(
   wallet: WalletState,
   chainId: string,

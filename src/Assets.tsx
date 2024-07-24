@@ -13,7 +13,8 @@ import {
   delegateSettlePnL,
   usdFormatter,
   settlePnL,
-  getUnsettledPnL
+  getUnsettledPnL,
+  withdraw
 } from './helpers';
 
 export const Assets: FC<{
@@ -69,6 +70,9 @@ export const Assets: FC<{
         return;
       }
       const address = wallet.accounts[0].address;
+      console.log('address', address);
+      console.log('usdcContract', usdcContract);
+      console.log('getUSDCAddress(connectedChain.id)', getUSDCAddress(connectedChain.id));
       usdcContract.balanceOf(address).then(setBalance);
       usdcContract.allowance(address, getVaultAddress(connectedChain.id)).then(setAllowance);
     };
@@ -82,6 +86,7 @@ export const Assets: FC<{
       setContractBalance(undefined);
       return;
     }
+    console.log('contractAddress', contractAddress);
     const fetchContractBalance = async () => {
       if (!usdcContract || !contractAddress) {
         setContractBalance(undefined);
@@ -161,32 +166,19 @@ export const Assets: FC<{
         </Table.Body>
       </Table.Root>
 
-      {showEOA && (
-        <Flex direction="column" gap="4">
-          <Button
-            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
-            onClick={async () => {
-              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
-              await settlePnL(wallet, connectedChain.id, brokerId, accountId, orderlyKey);
-            }}
-          >
-            Settle PnL
-          </Button>
-        </Flex>
-      )}
+      <Flex direction="column" gap="4">
+        <TextField.Root
+          style={{ gridArea: 'input' }}
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="USDC amount"
+          onChange={(event) => {
+            setAmount(event.target.value);
+          }}
+        />
 
-      {!showEOA && (
-        <Flex direction="column" gap="4">
-          <TextField.Root
-            style={{ gridArea: 'input' }}
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="USDC amount"
-            onChange={(event) => {
-              setAmount(event.target.value);
-            }}
-          />
+        {!showEOA && (
           <Button
             disabled={
               !wallet ||
@@ -233,7 +225,29 @@ export const Assets: FC<{
           >
             {needsApproval ? 'Approve' : 'Deposit to Contract'}
           </Button>
+        )}
 
+        {showEOA ? (
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !orderlyKey || !amount) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              await withdraw(
+                wallet,
+                connectedChain.id,
+                brokerId,
+                accountId,
+                orderlyKey,
+                amountBN.toString(),
+                wallet.accounts[0].address
+              );
+            }}
+          >
+            Withdraw
+          </Button>
+        ) : (
           <Button
             disabled={
               !wallet ||
@@ -262,7 +276,19 @@ export const Assets: FC<{
           >
             Withdraw from Contract
           </Button>
+        )}
 
+        {showEOA ? (
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
+              await settlePnL(wallet, connectedChain.id, brokerId, accountId, orderlyKey);
+            }}
+          >
+            Settle PnL
+          </Button>
+        ) : (
           <Button
             disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
             onClick={async () => {
@@ -279,8 +305,8 @@ export const Assets: FC<{
           >
             Settle Delegate PnL
           </Button>
-        </Flex>
-      )}
+        )}
+      </Flex>
     </Flex>
   );
 };
