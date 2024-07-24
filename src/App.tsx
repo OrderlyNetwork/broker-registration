@@ -52,12 +52,12 @@ function App() {
   }, [connectedChain]);
 
   useEffect(() => {
-    if (accountId) {
-      setOrderlyKey(loadOrderlyKey(accountId));
+    if (accountId && connectedChain) {
+      setOrderlyKey(loadOrderlyKey(accountId, connectedChain.id));
     } else {
       setOrderlyKey(undefined);
     }
-  }, [accountId]);
+  }, [accountId, connectedChain]);
 
   const isChainSupported = supportedChainIds.includes(Number(connectedChain?.id));
 

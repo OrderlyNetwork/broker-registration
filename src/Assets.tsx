@@ -11,7 +11,9 @@ import {
   delegateWithdraw,
   getClientHolding,
   delegateSettlePnL,
-  usdFormatter
+  usdFormatter,
+  settlePnL,
+  getUnsettledPnL
 } from './helpers';
 
 export const Assets: FC<{
@@ -27,6 +29,7 @@ export const Assets: FC<{
   const [contractBalance, setContractBalance] = useState<bigint>();
   const [vaultBalance, setVaultBalance] = useState<number>();
   const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
+  const [unsettledPnL, setUnsettledPnL] = useState<number>();
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -93,20 +96,31 @@ export const Assets: FC<{
 
   useEffect(() => {
     if (!connectedChain || !orderlyKey) {
-      setBalance(undefined);
-      setAllowance(undefined);
       return;
     }
     const fetchVaultBalance = async () => {
       if (!connectedChain || !orderlyKey) {
-        setBalance(undefined);
-        setAllowance(undefined);
         return;
       }
       getClientHolding(connectedChain.id, accountId, orderlyKey).then(setVaultBalance);
     };
     const interval = setInterval(fetchVaultBalance, 5_000);
     fetchVaultBalance();
+    return () => clearInterval(interval);
+  }, [connectedChain, accountId, orderlyKey]);
+
+  useEffect(() => {
+    if (!connectedChain || !orderlyKey) {
+      return;
+    }
+    const fetchUnsettledPnL = async () => {
+      if (!connectedChain || !orderlyKey) {
+        return;
+      }
+      getUnsettledPnL(connectedChain.id, accountId, orderlyKey).then(setUnsettledPnL);
+    };
+    const interval = setInterval(fetchUnsettledPnL, 5_000);
+    fetchUnsettledPnL();
     return () => clearInterval(interval);
   }, [connectedChain, accountId, orderlyKey]);
 
@@ -138,8 +152,28 @@ export const Assets: FC<{
               {vaultBalance != null ? usdFormatter.format(vaultBalance) : '-'}
             </Table.Cell>
           </Table.Row>
+          <Table.Row>
+            <Table.RowHeaderCell>Unsettled PnL (USDC):</Table.RowHeaderCell>
+            <Table.Cell>
+              {unsettledPnL != null ? usdFormatter.format(unsettledPnL) : '-'}
+            </Table.Cell>
+          </Table.Row>
         </Table.Body>
       </Table.Root>
+
+      {showEOA && (
+        <Flex direction="column" gap="4">
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
+              await settlePnL(wallet, connectedChain.id, brokerId, accountId, orderlyKey);
+            }}
+          >
+            Settle PnL
+          </Button>
+        </Flex>
+      )}
 
       {!showEOA && (
         <Flex direction="column" gap="4">

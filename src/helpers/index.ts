@@ -18,7 +18,8 @@ import {
   getOffChainDomain,
   getOnChainDomain,
   getVaultAddress,
-  getVerifyingAddress
+  getVerifyingAddress,
+  isTestnet
 } from './constants';
 
 export * from './constants';
@@ -201,7 +202,7 @@ export async function addOrderlyKey(
     throw new Error(keyJson.message);
   }
   window.localStorage.setItem(
-    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}`,
+    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}:${isTestnet(chainId) ? 'testnet' : 'mainnet'}`,
     base64EncodeURL(privateKey)
   );
   return privateKey;
@@ -314,7 +315,7 @@ export async function delegateAddOrderlyKey(
     throw new Error(keyJson.message);
   }
   window.localStorage.setItem(
-    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}`,
+    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}:${isTestnet(chainId) ? 'testnet' : 'mainnet'}`,
     base64EncodeURL(privateKey)
   );
   return privateKey;
@@ -453,6 +454,56 @@ export async function delegateSettlePnL(
   }
 }
 
+export async function settlePnL(
+  wallet: WalletState,
+  chainId: string,
+  brokerId: string,
+  accountId: string,
+  orderlyKey: Uint8Array
+): Promise<void> {
+  const nonceRes = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/settle_nonce`
+  );
+  const nonceJson = await nonceRes.json();
+  const settleNonce = nonceJson.data.settle_nonce as string;
+
+  const settlePnLMessage = {
+    brokerId,
+    chainId: Number(chainId),
+    timestamp: Date.now(),
+    settleNonce
+  };
+
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOnChainDomain(chainId),
+    { SettlePnl: MESSAGE_TYPES.SettlePnl },
+    settlePnLMessage
+  );
+
+  const res = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/settle_pnl`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        signature,
+        message: settlePnLMessage,
+        userAddress: wallet.accounts[0].address,
+        verifyingContract: getVerifyingAddress(chainId)
+      })
+    }
+  );
+  const registerJson = await res.json();
+  if (!registerJson.success) {
+    throw new Error(registerJson.message);
+  }
+}
+
 export async function getClientHolding(
   chainId: string,
   accountId: string,
@@ -474,6 +525,23 @@ export async function getClientHolding(
   return holdings.find(({ token }) => token === 'USDC')?.holding ?? 0;
 }
 
+export async function getUnsettledPnL(chainId: string, accountId: string, orderlyKey: Uint8Array) {
+  const res = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/positions`
+  );
+  if (!res.ok) {
+    throw new Error(`Could not fetch client holding`);
+  }
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.message);
+  }
+  const positions = json.data.rows as API.Position[];
+  return positions.reduce((acc, position) => acc + position.unsettled_pnl, 0);
+}
+
 async function signAndSendRequest(
   accountId: string,
   orderlyKey: Uint8Array | string,
@@ -493,7 +561,9 @@ async function signAndSendRequest(
   return fetch(input, {
     headers: {
       'Content-Type':
-        init?.method !== 'GET' ? 'application/json' : 'application/x-www-form-urlencoded',
+        init?.method !== 'GET' && init?.method !== 'DELETE'
+          ? 'application/json'
+          : 'application/x-www-form-urlencoded',
       'orderly-timestamp': String(timestamp),
       'orderly-account-id': accountId,
       'orderly-key': `ed25519:${encodeBase58(await getPublicKeyAsync(orderlyKey))}`,
@@ -514,8 +584,10 @@ export function getAccountId(address: string, brokerId: string) {
   );
 }
 
-export function loadOrderlyKey(accountId: string): Uint8Array | undefined {
-  const key = window.localStorage.getItem(`${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}`);
+export function loadOrderlyKey(accountId: string, chainId: string): Uint8Array | undefined {
+  const key = window.localStorage.getItem(
+    `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}:${isTestnet(chainId) ? 'testnet' : 'mainnet'}`
+  );
   if (!key) return;
   return base64DecodeURL(key);
 }
