@@ -1,5 +1,5 @@
 import { getPublicKeyAsync } from '@noble/ed25519';
-import { CopyIcon } from '@radix-ui/react-icons';
+import { CopyIcon, QuestionMarkCircledIcon } from '@radix-ui/react-icons';
 import {
   Button,
   Card,
@@ -9,7 +9,8 @@ import {
   Heading,
   IconButton,
   Text,
-  TextField
+  TextField,
+  Tooltip
 } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { encodeBase58 } from 'ethers';
@@ -85,7 +86,15 @@ export const DelegateSigner: FC<{
             <Flex gap="1" direction="column">
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Wallet Address:
+                  Wallet Address{' '}
+                  <Tooltip content="Your connected EOA wallet">
+                    <QuestionMarkCircledIcon
+                      style={{
+                        height: '1rem'
+                      }}
+                    />
+                  </Tooltip>
+                  :
                 </Text>
                 <Text as="div" size="2">
                   {wallet.accounts[0].address}
@@ -93,7 +102,15 @@ export const DelegateSigner: FC<{
               </Container>
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Delegate Signer Address:
+                  Delegate Signer Address{' '}
+                  <Tooltip content="The connected contract/multisig address">
+                    <QuestionMarkCircledIcon
+                      style={{
+                        height: '1rem'
+                      }}
+                    />
+                  </Tooltip>
+                  :
                 </Text>
                 <Text as="div" size="2">
                   {contractAddress}
@@ -101,7 +118,15 @@ export const DelegateSigner: FC<{
               </Container>
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Orderly Account ID:
+                  Orderly Account ID{' '}
+                  <Tooltip content="The account ID for the contract/multisig address">
+                    <QuestionMarkCircledIcon
+                      style={{
+                        height: '1rem'
+                      }}
+                    />
+                  </Tooltip>
+                  :
                 </Text>
                 <Text as="div" size="2">
                   {accountId ?? '-'}
@@ -117,7 +142,15 @@ export const DelegateSigner: FC<{
               </Container>
               <Container>
                 <Text as="div" size="2" weight="bold">
-                  Valid Signer:
+                  Valid Signer{' '}
+                  <Tooltip content="The address of the currently active EOA wallet with sign permission for the contract/multisig">
+                    <QuestionMarkCircledIcon
+                      style={{
+                        height: '1rem'
+                      }}
+                    />
+                  </Tooltip>
+                  :
                 </Text>
                 <Text as="div" size="2">
                   {delegateSigner ? delegateSigner.valid_signer : '-'}
