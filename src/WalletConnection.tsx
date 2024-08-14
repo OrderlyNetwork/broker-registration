@@ -47,7 +47,11 @@ export const WalletConnection: FC = () => {
                 fontWeight: connectedChain?.id === id ? '600' : undefined
               }}
             >
-              <img src={icon} alt={label} style={{ marginRight: '0.3rem', height: '1.8rem' }} />
+              <img
+                src={icon}
+                alt={label}
+                style={{ marginRight: '0.3rem', height: '1.8rem', width: '1.8rem' }}
+              />
               {label}
             </DropdownMenu.Item>
           ))}
@@ -65,7 +69,17 @@ export const WalletConnection: FC = () => {
                 fontWeight: connectedChain?.id === id ? '600' : undefined
               }}
             >
-              <img src={icon} alt={label} style={{ marginRight: '0.3rem', height: '1.8rem' }} />
+              <img
+                src={icon}
+                alt={label}
+                style={{
+                  marginRight: '0.3rem',
+                  height: '1.8rem',
+                  width: '1.8rem',
+                  backgroundColor: '#bbb',
+                  borderRadius: '50%'
+                }}
+              />
               {label}
             </DropdownMenu.Item>
           ))}
