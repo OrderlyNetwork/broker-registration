@@ -64,7 +64,7 @@ export const DelegateSigner: FC<{
   const privateKey = orderlyKey ? `ed25519:${encodeBase58(orderlyKey)}` : null;
 
   return (
-    <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
+    <Flex style={{ margin: '1.5rem 0' }} gap="2" align="center" justify="center" direction="column">
       <Heading>Delegate Signer</Heading>
 
       <Text>
@@ -80,7 +80,7 @@ export const DelegateSigner: FC<{
         respective smart contract account.
       </Text>
 
-      <Card style={{ maxWidth: 480 }}>
+      <Card style={{ maxWidth: 'min(100%, 480px)' }}>
         {wallet ? (
           <>
             <Flex gap="1" direction="column">
@@ -160,8 +160,8 @@ export const DelegateSigner: FC<{
                 <Text as="div" size="2" weight="bold">
                   Orderly Public Key:
                 </Text>
-                <Flex gap="2">
-                  <Text as="div" size="2">
+                <Flex gap="2" style={{ maxWidth: '100%' }}>
+                  <Text as="div" size="2" style={{ wordWrap: 'break-word', maxWidth: '100%' }}>
                     {publicKey ?? '-'}
                   </Text>
                   {publicKey && (

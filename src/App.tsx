@@ -81,12 +81,12 @@ function App() {
         .
       </Text>
 
-      <Flex gap="4" align="end" wrap="wrap">
+      <Flex gap="2" align="end" wrap="wrap">
         <Container style={{ width: '100%' }}>
           <WalletConnection />
         </Container>
 
-        <Flex gap="4" align="end">
+        <Flex gap="2" align="end">
           <label>
             Broker ID
             <TextField.Root

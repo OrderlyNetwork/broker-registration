@@ -57,7 +57,7 @@ export const Account: FC<{
   const privateKey = orderlyKey ? `ed25519:${encodeBase58(orderlyKey)}` : null;
 
   return (
-    <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
+    <Flex style={{ margin: '1.5rem 0' }} gap="2" align="center" justify="center" direction="column">
       <Heading>Account</Heading>
 
       <Text>
@@ -65,7 +65,7 @@ export const Account: FC<{
         helpful to register an admin address for your broker.
       </Text>
 
-      <Card style={{ maxWidth: 480 }}>
+      <Card style={{ maxWidth: 'min(100%, 480px)' }}>
         {wallet ? (
           <>
             <Flex gap="1" direction="column">
@@ -73,12 +73,12 @@ export const Account: FC<{
                 <Text as="div" size="2" weight="bold">
                   Address:
                 </Text>
-                <Text as="div" size="2">
+                <Text as="div" size="2" style={{ wordWrap: 'break-word' }}>
                   {wallet.accounts[0].address}
                 </Text>
               </Container>
               <Container>
-                <Text as="div" size="2" weight="bold">
+                <Text as="div" size="2" weight="bold" style={{ wordWrap: 'break-word' }}>
                   Orderly Account ID:
                 </Text>
                 <Text as="div" size="2">
@@ -97,8 +97,8 @@ export const Account: FC<{
                 <Text as="div" size="2" weight="bold">
                   Orderly Public Key:
                 </Text>
-                <Flex gap="2">
-                  <Text as="div" size="2">
+                <Flex gap="2" style={{ maxWidth: '100%' }}>
+                  <Text as="div" size="2" style={{ wordWrap: 'break-word', maxWidth: '100%' }}>
                     {publicKey ?? '-'}
                   </Text>
                   {publicKey && (
