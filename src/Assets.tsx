@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Table, TextField } from '@radix-ui/themes';
+import { Button, Callout, Flex, Heading, Table, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
 import { FC, useEffect, useState } from 'react';
@@ -132,6 +132,14 @@ export const Assets: FC<{
   return (
     <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
       <Heading>Assets</Heading>
+
+      {!orderlyKey && (
+        <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
+          <Callout.Text>
+            You need to create an Orderly key in order to be able to display your Orderly balance.
+          </Callout.Text>
+        </Callout.Root>
+      )}
 
       <Table.Root>
         <Table.Body>
