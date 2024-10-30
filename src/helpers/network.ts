@@ -9,7 +9,7 @@ export const supportedChains: SupportedChain[] = [
     id: '0x1',
     token: 'ETH',
     label: 'Ethereum',
-    rpcUrl: 'https://ethereum-rpc.publicnode.com'
+    rpcUrl: 'https://arbitrum-one.publicnode.com'
   },
   {
     network: 'mainnet',
@@ -17,7 +17,7 @@ export const supportedChains: SupportedChain[] = [
     id: '0xa4b1',
     token: 'ETH',
     label: 'Arbitrum One',
-    rpcUrl: 'https://arbitrum-one.publicnode.com'
+    rpcUrl: 'https://ethereum-rpc.publicnode.com'
   },
   {
     network: 'mainnet',
@@ -36,8 +36,24 @@ export const supportedChains: SupportedChain[] = [
     rpcUrl: 'https://base-rpc.publicnode.com'
   },
   {
+    network: 'mainnet',
+    icon: './assets/mantle.svg',
+    id: '0x1388',
+    token: 'MNT',
+    label: 'Mantle',
+    rpcUrl: 'https://rpc.mantle.xyz'
+  },
+  {
+    network: 'mainnet',
+    icon: './assets/sei.svg',
+    id: '0x531',
+    token: 'SEI',
+    label: 'Sei',
+    rpcUrl: 'https://evm-rpc.sei-apis.com'
+  },
+  {
     network: 'testnet',
-    icon: './assets/ethereum_sepolia.svg',
+    icon: './assets/sepolia.svg',
     id: '0xaa36a7',
     token: 'ETH',
     label: 'Sepolia',
@@ -66,6 +82,22 @@ export const supportedChains: SupportedChain[] = [
     token: 'ETH',
     label: 'Base Sepolia',
     rpcUrl: 'https://base-sepolia-rpc.publicnode.com'
+  },
+  {
+    network: 'testnet',
+    icon: './assets/mantle_sepolia.svg',
+    id: '0x138b',
+    token: 'MNT',
+    label: 'Mantle Sepolia',
+    rpcUrl: 'https://rpc.sepolia.mantle.xyz'
+  },
+  {
+    network: 'testnet',
+    icon: './assets/sei_testnet.svg',
+    id: '0xae3f3',
+    token: 'SEI',
+    label: 'Sei Devnet',
+    rpcUrl: 'https://evm-rpc-arctic-1.sei-apis.com'
   }
 ];
 
