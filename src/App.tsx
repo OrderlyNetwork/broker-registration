@@ -1,4 +1,14 @@
-import { Button, Callout, Container, Flex, Heading, Tabs, Text, TextField } from '@radix-ui/themes';
+import {
+  Button,
+  Callout,
+  Container,
+  Flex,
+  Heading,
+  RadioCards,
+  Tabs,
+  Text,
+  TextField
+} from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +34,7 @@ function App() {
   const [orderlyKey, setOrderlyKey] = useState<Uint8Array>();
   const [showEOA, setShowEOA] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
+  const [registrationType, setRegistrationType] = useState<'eoa' | 'delegatesigner'>('eoa');
 
   const [{ wallet }, connectWallet] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -74,71 +85,103 @@ function App() {
         .
       </Text>
 
-      <Flex gap="2" align="end" wrap="wrap">
+      <Flex direction="column" gap="4">
         <Container style={{ width: '100%' }}>
           <WalletConnection />
         </Container>
 
-        <Flex gap="2" align="end">
+        <Flex>
           <label>
-            Broker ID
-            <TextField.Root
-              value={brokerId}
-              onChange={(event) => {
-                setBrokerId(event.target.value);
-                setAccountId(undefined);
-              }}
-            />
+            Registration Type
+            <RadioCards.Root value={registrationType} columns={{ initial: '1', sm: '2' }}>
+              <RadioCards.Item
+                value="eoa"
+                onClick={() => {
+                  setRegistrationType('eoa');
+                }}
+              >
+                <Flex direction="column" width="100%">
+                  <Text weight="bold">EOA wallet</Text>
+                </Flex>
+              </RadioCards.Item>
+              <RadioCards.Item
+                value="delegatesigner"
+                onClick={() => {
+                  setRegistrationType('delegatesigner');
+                }}
+              >
+                <Flex direction="column" width="100%">
+                  <Text weight="bold">Multisig wallet</Text>
+                </Flex>
+              </RadioCards.Item>
+            </RadioCards.Root>
           </label>
-
-          <Button
-            disabled={!brokerId || !connectedChain || !isChainSupported}
-            onClick={async () => {
-              if (!brokerId || !wallet || !connectedChain) return;
-              const userAddress = wallet.accounts[0].address;
-              if (!userAddress) return;
-              setAccountId(getAccountId(userAddress, brokerId));
-              saveBrokerId(connectedChain.id, brokerId);
-              setShowEOA(true);
-              setActiveTab('account');
-            }}
-          >
-            Load Connected Address
-          </Button>
         </Flex>
 
-        <Flex gap="4" align="end">
-          <label>
-            Delegate Signer Address
-            <TextField.Root
-              value={contractAddress}
-              onChange={(event) => {
-                setContractAddress(event.target.value);
-                setAccountId(undefined);
-              }}
-            />
-          </label>
+        {registrationType === 'eoa' && (
+          <Flex gap="2" align="end">
+            <label>
+              Broker ID
+              <TextField.Root
+                value={brokerId}
+                onChange={(event) => {
+                  setBrokerId(event.target.value);
+                  setAccountId(undefined);
+                }}
+              />
+            </label>
 
-          <Button
-            disabled={
-              !brokerId ||
-              !contractAddress ||
-              !connectedChain ||
-              contractAddress.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
-              !isChainSupported
-            }
-            onClick={async () => {
-              if (!brokerId || !contractAddress || !connectedChain) return;
-              setAccountId(getAccountId(contractAddress, brokerId));
-              saveBrokerId(connectedChain.id, brokerId);
-              saveContractAddress(connectedChain.id, contractAddress);
-              setShowEOA(false);
-              setActiveTab('delegate-signer');
-            }}
-          >
-            Load Delegate Signer
-          </Button>
-        </Flex>
+            <Button
+              disabled={!brokerId || !connectedChain || !isChainSupported}
+              onClick={async () => {
+                if (!brokerId || !wallet || !connectedChain) return;
+                const userAddress = wallet.accounts[0].address;
+                if (!userAddress) return;
+                setAccountId(getAccountId(userAddress, brokerId));
+                saveBrokerId(connectedChain.id, brokerId);
+                setShowEOA(true);
+                setActiveTab('account');
+              }}
+            >
+              Load Connected Address
+            </Button>
+          </Flex>
+        )}
+
+        {registrationType === 'delegatesigner' && (
+          <Flex gap="4" align="end">
+            <label>
+              Multisig Address
+              <TextField.Root
+                value={contractAddress}
+                onChange={(event) => {
+                  setContractAddress(event.target.value);
+                  setAccountId(undefined);
+                }}
+              />
+            </label>
+
+            <Button
+              disabled={
+                !brokerId ||
+                !contractAddress ||
+                !connectedChain ||
+                contractAddress.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
+                !isChainSupported
+              }
+              onClick={async () => {
+                if (!brokerId || !contractAddress || !connectedChain) return;
+                setAccountId(getAccountId(contractAddress, brokerId));
+                saveBrokerId(connectedChain.id, brokerId);
+                saveContractAddress(connectedChain.id, contractAddress);
+                setShowEOA(false);
+                setActiveTab('delegate-signer');
+              }}
+            >
+              Load Multisig Address
+            </Button>
+          </Flex>
+        )}
       </Flex>
 
       {accountId ? (

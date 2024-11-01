@@ -21,8 +21,6 @@ import {
   DelegateSignerResponse,
   announceDelegateSigner,
   delegateAddOrderlyKey,
-  registerExampleDelegateSigner,
-  isTestnet,
   Scope
 } from './helpers';
 
@@ -208,25 +206,6 @@ export const DelegateSigner: FC<{
           </Text>
         )}
       </Card>
-
-      {connectedChain && isTestnet(connectedChain.id) && (
-        <Button
-          disabled={!wallet || !connectedChain || !wallet.accounts[0]}
-          onClick={async () => {
-            const address = wallet?.accounts[0]?.address;
-            if (!wallet || !connectedChain || !address) return;
-            const hash = await registerExampleDelegateSigner(
-              wallet,
-              brokerId,
-              connectedChain.id,
-              address
-            );
-            setTxHash(hash);
-          }}
-        >
-          Register Example Delegate Signer
-        </Button>
-      )}
 
       {connectedChain && <SafeInstructions brokerId={brokerId} chainId={connectedChain.id} />}
 
