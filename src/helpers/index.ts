@@ -10,7 +10,7 @@ import {
   AbiCoder
 } from 'ethers';
 
-import { DelegateSigner__factory, Vault__factory } from '../abi';
+import { Vault__factory } from '../abi';
 import { VaultTypes } from '../abi/Vault';
 
 import {
@@ -104,8 +104,6 @@ const MESSAGE_TYPES = {
     { name: 'timestamp', type: 'uint64' }
   ]
 };
-
-export const exampleDelegateContract = '0xa4394b62261061c629800c6d86d153a9f38f0cbb';
 
 export type DelegateSignerResponse = {
   // TODO no GET yet available
@@ -206,22 +204,6 @@ export async function addOrderlyKey(
     base64EncodeURL(privateKey)
   );
   return privateKey;
-}
-
-export async function registerExampleDelegateSigner(
-  wallet: WalletState,
-  brokerId: string,
-  chainId: string,
-  address: string
-): Promise<string> {
-  const provider = new BrowserProvider(wallet.provider);
-  const signer = await provider.getSigner();
-  const contract = DelegateSigner__factory.connect(exampleDelegateContract, signer);
-  const res = await contract.delegate(getVaultAddress(chainId), {
-    brokerHash: solidityPackedKeccak256(['string'], [brokerId]),
-    delegateSigner: address
-  });
-  return res.hash;
 }
 
 export async function announceDelegateSigner(

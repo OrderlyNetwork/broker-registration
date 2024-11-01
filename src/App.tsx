@@ -8,12 +8,9 @@ import { DelegateSigner } from './DelegateSigner';
 import { WalletConnection } from './WalletConnection';
 import {
   DelegateSignerResponse,
-  exampleDelegateContract,
   getAccountId,
   loadOrderlyKey,
-  isTestnet,
   loadBrokerId,
-  loadContractAddress,
   saveBrokerId,
   saveContractAddress,
   supportedChainIds
@@ -39,10 +36,6 @@ function App() {
     setAccountId(undefined);
     if (connectedChain) {
       setBrokerId(loadBrokerId(connectedChain.id));
-      const address = loadContractAddress(connectedChain.id);
-      if (!address && isTestnet(connectedChain.id)) {
-        setContractAddress(exampleDelegateContract);
-      }
     } else {
       setBrokerId('');
       setContractAddress('');
