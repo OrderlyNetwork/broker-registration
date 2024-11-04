@@ -155,7 +155,11 @@ function App() {
               <TextField.Root
                 value={contractAddress}
                 onChange={(event) => {
-                  setContractAddress(event.target.value);
+                  let value = event.target.value;
+                  if (value.includes(':')) {
+                    value = value.split(':')[1];
+                  }
+                  setContractAddress(value);
                   setAccountId(undefined);
                 }}
               />
