@@ -21,6 +21,7 @@ import {
   getVerifyingAddress,
   isTestnet
 } from './constants';
+import { SupportedChainIds } from './network';
 
 export * from './constants';
 export * from './network';
@@ -114,7 +115,7 @@ export type DelegateSignerResponse = {
 
 export async function registerAccount(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string
 ): Promise<string> {
   const nonceRes = await fetch(`${getBaseUrl(chainId)}/v1/registration_nonce`);
@@ -158,7 +159,7 @@ export async function registerAccount(
 
 export async function addOrderlyKey(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   scope: Scope,
   accountId: string
@@ -208,7 +209,7 @@ export async function addOrderlyKey(
 
 export async function announceDelegateSigner(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   delegateContract: string,
   txHash: ethers.BytesLike
@@ -254,7 +255,7 @@ export async function announceDelegateSigner(
 
 export async function delegateAddOrderlyKey(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   delegateContract: string,
   accountId: string,
@@ -305,7 +306,7 @@ export async function delegateAddOrderlyKey(
 
 export async function delegateDeposit(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   delegateContract: string,
   amount: string,
@@ -329,7 +330,7 @@ export async function delegateDeposit(
 
 export async function withdraw(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   accountId: string,
   orderlyKey: Uint8Array,
@@ -384,7 +385,7 @@ export async function withdraw(
 
 export async function delegateWithdraw(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   delegateContract: string,
   accountId: string,
@@ -441,7 +442,7 @@ export async function delegateWithdraw(
 
 export async function delegateSettlePnL(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   delegateContract: string,
   accountId: string,
@@ -493,7 +494,7 @@ export async function delegateSettlePnL(
 
 export async function settlePnL(
   wallet: WalletState,
-  chainId: string,
+  chainId: SupportedChainIds,
   brokerId: string,
   accountId: string,
   orderlyKey: Uint8Array
@@ -542,7 +543,7 @@ export async function settlePnL(
 }
 
 export async function getClientHolding(
-  chainId: string,
+  chainId: SupportedChainIds,
   accountId: string,
   orderlyKey: Uint8Array
 ): Promise<number> {
@@ -562,7 +563,11 @@ export async function getClientHolding(
   return holdings.find(({ token }) => token === 'USDC')?.holding ?? 0;
 }
 
-export async function getUnsettledPnL(chainId: string, accountId: string, orderlyKey: Uint8Array) {
+export async function getUnsettledPnL(
+  chainId: SupportedChainIds,
+  accountId: string,
+  orderlyKey: Uint8Array
+) {
   const res = await signAndSendRequest(
     accountId,
     orderlyKey,
@@ -621,7 +626,10 @@ export function getAccountId(address: string, brokerId: string) {
   );
 }
 
-export function loadOrderlyKey(accountId: string, chainId: string): Uint8Array | undefined {
+export function loadOrderlyKey(
+  accountId: string,
+  chainId: SupportedChainIds
+): Uint8Array | undefined {
   const key = window.localStorage.getItem(
     `${ORDERLY_KEY_LOCAL_STORAGE}:${accountId}:${isTestnet(chainId) ? 'testnet' : 'mainnet'}`
   );
@@ -629,19 +637,19 @@ export function loadOrderlyKey(accountId: string, chainId: string): Uint8Array |
   return base64DecodeURL(key);
 }
 
-export function loadBrokerId(chainId: string): string {
+export function loadBrokerId(chainId: SupportedChainIds): string {
   return window.localStorage.getItem(`${BROKER_ID_LOCAL_STORAGE}:${chainId}`) ?? '';
 }
 
-export function saveBrokerId(chainId: string, brokerId: string) {
+export function saveBrokerId(chainId: SupportedChainIds, brokerId: string) {
   return window.localStorage.setItem(`${BROKER_ID_LOCAL_STORAGE}:${chainId}`, brokerId);
 }
 
-export function loadContractAddress(chainId: string): string {
+export function loadContractAddress(chainId: SupportedChainIds): string {
   return window.localStorage.getItem(`${CONTRACT_ADDRESS_LOCAL_STORAGE}:${chainId}`) ?? '';
 }
 
-export function saveContractAddress(chainId: string, contractAddress: string) {
+export function saveContractAddress(chainId: SupportedChainIds, contractAddress: string) {
   return window.localStorage.setItem(
     `${CONTRACT_ADDRESS_LOCAL_STORAGE}:${chainId}`,
     contractAddress

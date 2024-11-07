@@ -2,7 +2,7 @@ import type { Chain } from '@web3-onboard/common';
 
 type SupportedChain = Chain & { network: 'mainnet' | 'testnet'; icon: string };
 
-export const supportedChains: SupportedChain[] = [
+export const supportedChains = [
   {
     network: 'mainnet',
     icon: './assets/ethereum.svg',
@@ -99,6 +99,7 @@ export const supportedChains: SupportedChain[] = [
     label: 'Sei Devnet',
     rpcUrl: 'https://evm-rpc-arctic-1.sei-apis.com'
   }
-];
+] as const satisfies SupportedChain[];
 
-export const supportedChainIds = supportedChains.map(({ id }) => Number(id));
+export const supportedChainIds = supportedChains.map(({ id }) => id);
+export type SupportedChainIds = (typeof supportedChainIds)[0];

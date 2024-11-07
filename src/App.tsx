@@ -23,7 +23,8 @@ import {
   loadBrokerId,
   saveBrokerId,
   saveContractAddress,
-  supportedChainIds
+  supportedChainIds,
+  SupportedChainIds
 } from './helpers';
 
 function App() {
@@ -45,8 +46,8 @@ function App() {
 
   useEffect(() => {
     setAccountId(undefined);
-    if (connectedChain) {
-      setBrokerId(loadBrokerId(connectedChain.id));
+    if (connectedChain && supportedChainIds.includes(connectedChain.id as SupportedChainIds)) {
+      setBrokerId(loadBrokerId(connectedChain.id as SupportedChainIds));
     } else {
       setBrokerId('');
       setContractAddress('');
@@ -54,14 +55,18 @@ function App() {
   }, [connectedChain]);
 
   useEffect(() => {
-    if (accountId && connectedChain) {
-      setOrderlyKey(loadOrderlyKey(accountId, connectedChain.id));
+    if (
+      accountId &&
+      connectedChain &&
+      supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+    ) {
+      setOrderlyKey(loadOrderlyKey(accountId, connectedChain.id as SupportedChainIds));
     } else {
       setOrderlyKey(undefined);
     }
   }, [accountId, connectedChain]);
 
-  const isChainSupported = supportedChainIds.includes(Number(connectedChain?.id));
+  const isChainSupported = supportedChainIds.includes(connectedChain?.id as SupportedChainIds);
 
   return (
     <Flex
@@ -134,11 +139,17 @@ function App() {
             <Button
               disabled={!brokerId || !connectedChain || !isChainSupported}
               onClick={async () => {
-                if (!brokerId || !wallet || !connectedChain) return;
+                if (
+                  !brokerId ||
+                  !wallet ||
+                  !connectedChain ||
+                  !supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+                )
+                  return;
                 const userAddress = wallet.accounts[0].address;
                 if (!userAddress) return;
                 setAccountId(getAccountId(userAddress, brokerId));
-                saveBrokerId(connectedChain.id, brokerId);
+                saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
                 setShowEOA(true);
                 setActiveTab('account');
               }}
@@ -174,10 +185,16 @@ function App() {
                 !isChainSupported
               }
               onClick={async () => {
-                if (!brokerId || !contractAddress || !connectedChain) return;
+                if (
+                  !brokerId ||
+                  !contractAddress ||
+                  !connectedChain ||
+                  !supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+                )
+                  return;
                 setAccountId(getAccountId(contractAddress, brokerId));
-                saveBrokerId(connectedChain.id, brokerId);
-                saveContractAddress(connectedChain.id, contractAddress);
+                saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
+                saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
                 setShowEOA(false);
                 setActiveTab('delegate-signer');
               }}
