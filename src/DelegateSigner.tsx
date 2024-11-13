@@ -21,7 +21,8 @@ import {
   DelegateSignerResponse,
   announceDelegateSigner,
   delegateAddOrderlyKey,
-  Scope
+  Scope,
+  SupportedChainIds
 } from './helpers';
 
 export const DelegateSigner: FC<{
@@ -225,7 +226,7 @@ export const DelegateSigner: FC<{
             if (!wallet || !connectedChain || !brokerId || !txHash) return;
             const res = await announceDelegateSigner(
               wallet,
-              connectedChain.id,
+              connectedChain.id as SupportedChainIds,
               brokerId,
               contractAddress,
               txHash
@@ -271,7 +272,7 @@ export const DelegateSigner: FC<{
           if (!wallet || !connectedChain || !brokerId) return;
           const key = await delegateAddOrderlyKey(
             wallet,
-            connectedChain.id,
+            connectedChain.id as SupportedChainIds,
             brokerId,
             contractAddress,
             accountId,

@@ -14,7 +14,8 @@ import {
   usdFormatter,
   settlePnL,
   getUnsettledPnL,
-  withdraw
+  withdraw,
+  SupportedChainIds
 } from './helpers';
 
 export const Assets: FC<{
@@ -52,7 +53,9 @@ export const Assets: FC<{
       }
       const ethersProvider = new BrowserProvider(wallet.provider);
       const signer = await ethersProvider.getSigner();
-      setUsdcContract(NativeUSDC__factory.connect(getUSDCAddress(connectedChain.id), signer));
+      setUsdcContract(
+        NativeUSDC__factory.connect(getUSDCAddress(connectedChain.id as SupportedChainIds), signer)
+      );
     }
     run();
   }, [wallet, connectedChain]);
@@ -72,9 +75,14 @@ export const Assets: FC<{
       const address = wallet.accounts[0].address;
       console.log('address', address);
       console.log('usdcContract', usdcContract);
-      console.log('getUSDCAddress(connectedChain.id)', getUSDCAddress(connectedChain.id));
+      console.log(
+        'getUSDCAddress(connectedChain.id)',
+        getUSDCAddress(connectedChain.id as SupportedChainIds)
+      );
       usdcContract.balanceOf(address).then(setBalance);
-      usdcContract.allowance(address, getVaultAddress(connectedChain.id)).then(setAllowance);
+      usdcContract
+        .allowance(address, getVaultAddress(connectedChain.id as SupportedChainIds))
+        .then(setAllowance);
     };
     const interval = setInterval(fetchBalanceAndAllowance, 5_000);
     fetchBalanceAndAllowance();
@@ -107,7 +115,9 @@ export const Assets: FC<{
       if (!connectedChain || !orderlyKey) {
         return;
       }
-      getClientHolding(connectedChain.id, accountId, orderlyKey).then(setVaultBalance);
+      getClientHolding(connectedChain.id as SupportedChainIds, accountId, orderlyKey).then(
+        setVaultBalance
+      );
     };
     const interval = setInterval(fetchVaultBalance, 5_000);
     fetchVaultBalance();
@@ -122,7 +132,9 @@ export const Assets: FC<{
       if (!connectedChain || !orderlyKey) {
         return;
       }
-      getUnsettledPnL(connectedChain.id, accountId, orderlyKey).then(setUnsettledPnL);
+      getUnsettledPnL(connectedChain.id as SupportedChainIds, accountId, orderlyKey).then(
+        setUnsettledPnL
+      );
     };
     const interval = setInterval(fetchUnsettledPnL, 5_000);
     fetchUnsettledPnL();
@@ -212,16 +224,19 @@ export const Assets: FC<{
               const amountBN = parseUnits(amount, 6);
               if (balance < amountBN) return;
               if (allowance < amountBN) {
-                await usdcContract.approve(getVaultAddress(connectedChain.id), amountBN);
+                await usdcContract.approve(
+                  getVaultAddress(connectedChain.id as SupportedChainIds),
+                  amountBN
+                );
                 const allow = await usdcContract.allowance(
                   wallet.accounts[0].address,
-                  getVaultAddress(connectedChain.id)
+                  getVaultAddress(connectedChain.id as SupportedChainIds)
                 );
                 setAllowance(allow);
               } else {
                 await delegateDeposit(
                   wallet,
-                  connectedChain.id,
+                  connectedChain.id as SupportedChainIds,
                   brokerId,
                   contractAddress,
                   amountBN.toString(),
@@ -244,7 +259,7 @@ export const Assets: FC<{
               if (parseUnits(String(vaultBalance), 6) < amountBN) return;
               await withdraw(
                 wallet,
-                connectedChain.id,
+                connectedChain.id as SupportedChainIds,
                 brokerId,
                 accountId,
                 orderlyKey,
@@ -272,7 +287,7 @@ export const Assets: FC<{
               if (parseUnits(String(vaultBalance), 6) < amountBN) return;
               await delegateWithdraw(
                 wallet,
-                connectedChain.id,
+                connectedChain.id as SupportedChainIds,
                 brokerId,
                 contractAddress,
                 accountId,
@@ -291,7 +306,13 @@ export const Assets: FC<{
             disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
             onClick={async () => {
               if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
-              await settlePnL(wallet, connectedChain.id, brokerId, accountId, orderlyKey);
+              await settlePnL(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                accountId,
+                orderlyKey
+              );
             }}
           >
             Settle PnL
@@ -303,7 +324,7 @@ export const Assets: FC<{
               if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
               await delegateSettlePnL(
                 wallet,
-                connectedChain.id,
+                connectedChain.id as SupportedChainIds,
                 brokerId,
                 contractAddress,
                 accountId,

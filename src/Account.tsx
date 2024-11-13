@@ -14,7 +14,7 @@ import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { encodeBase58 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
-import { registerAccount, addOrderlyKey, getBaseUrl, Scope } from './helpers';
+import { registerAccount, addOrderlyKey, getBaseUrl, Scope, SupportedChainIds } from './helpers';
 
 export const Account: FC<{
   brokerId: string;
@@ -47,7 +47,7 @@ export const Account: FC<{
         return;
       }
       const res = await fetch(
-        `${getBaseUrl(connectedChain.id)}/v1/public/account?account_id=${accountId}`
+        `${getBaseUrl(connectedChain.id as SupportedChainIds)}/v1/public/account?account_id=${accountId}`
       ).then((res) => res.json());
       setIsRegistered(res.success);
     };
@@ -150,7 +150,7 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId || isRegistered}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          await registerAccount(wallet, connectedChain.id, brokerId);
+          await registerAccount(wallet, connectedChain.id as SupportedChainIds, brokerId);
           setIsRegistered(true);
         }}
       >
@@ -189,7 +189,13 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          const key = await addOrderlyKey(wallet, connectedChain.id, brokerId, scope, accountId);
+          const key = await addOrderlyKey(
+            wallet,
+            connectedChain.id as SupportedChainIds,
+            brokerId,
+            scope,
+            accountId
+          );
           setOrderlyKey(key);
         }}
       >

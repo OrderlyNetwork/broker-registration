@@ -16,7 +16,7 @@ import { useConnectWallet } from '@web3-onboard/react';
 import { solidityPackedKeccak256 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
-import { getVaultAddress } from './helpers';
+import { getVaultAddress, SupportedChainIds } from './helpers';
 
 export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
   brokerId,
@@ -80,12 +80,12 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                     size="1"
                     variant="soft"
                     onClick={() => {
-                      navigator.clipboard.writeText(getVaultAddress(chainId));
+                      navigator.clipboard.writeText(getVaultAddress(chainId as SupportedChainIds));
                     }}
                   >
                     <CopyIcon height="12" />
                   </IconButton>
-                  <Blockquote>{getVaultAddress(chainId)}</Blockquote>
+                  <Blockquote>{getVaultAddress(chainId as SupportedChainIds)}</Blockquote>
                 </Flex>
                 <Flex gap="2" wrap="wrap" align="center">
                   <Strong>Copy ABI</Strong>
