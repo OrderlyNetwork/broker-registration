@@ -15,7 +15,8 @@ import {
   settlePnL,
   getUnsettledPnL,
   withdraw,
-  SupportedChainIds
+  SupportedChainIds,
+  deposit
 } from './helpers';
 
 export const Assets: FC<{
@@ -73,12 +74,6 @@ export const Assets: FC<{
         return;
       }
       const address = wallet.accounts[0].address;
-      console.log('address', address);
-      console.log('usdcContract', usdcContract);
-      console.log(
-        'getUSDCAddress(connectedChain.id)',
-        getUSDCAddress(connectedChain.id as SupportedChainIds)
-      );
       usdcContract.balanceOf(address).then(setBalance);
       usdcContract
         .allowance(address, getVaultAddress(connectedChain.id as SupportedChainIds))
@@ -94,7 +89,6 @@ export const Assets: FC<{
       setContractBalance(undefined);
       return;
     }
-    console.log('contractAddress', contractAddress);
     const fetchContractBalance = async () => {
       if (!usdcContract || !contractAddress) {
         setContractBalance(undefined);
@@ -198,7 +192,55 @@ export const Assets: FC<{
           }}
         />
 
-        {!showEOA && (
+        {showEOA ? (
+          <Button
+            disabled={
+              !wallet ||
+              !amount ||
+              !usdcContract ||
+              allowance == null ||
+              !connectedChain ||
+              !brokerId ||
+              !balance ||
+              balance < parseUnits(amount, 6)
+            }
+            onClick={async () => {
+              if (
+                !wallet ||
+                !amount ||
+                !usdcContract ||
+                allowance == null ||
+                !connectedChain ||
+                !brokerId ||
+                !balance
+              )
+                return;
+              const amountBN = parseUnits(amount, 6);
+              if (balance < amountBN) return;
+              if (allowance < amountBN) {
+                await usdcContract.approve(
+                  getVaultAddress(connectedChain.id as SupportedChainIds),
+                  amountBN
+                );
+                const allow = await usdcContract.allowance(
+                  wallet.accounts[0].address,
+                  getVaultAddress(connectedChain.id as SupportedChainIds)
+                );
+                setAllowance(allow);
+              } else {
+                await deposit(
+                  wallet,
+                  connectedChain.id as SupportedChainIds,
+                  brokerId,
+                  amountBN.toString(),
+                  accountId
+                );
+              }
+            }}
+          >
+            {needsApproval ? 'Approve' : 'Deposit'}
+          </Button>
+        ) : (
           <Button
             disabled={
               !wallet ||

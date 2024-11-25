@@ -328,6 +328,28 @@ export async function delegateDeposit(
   await contract.depositTo(delegateContract, depositInput, { value: depositFee });
 }
 
+export async function deposit(
+  wallet: WalletState,
+  chainId: SupportedChainIds,
+  brokerId: string,
+  amount: string,
+  accountId: string
+): Promise<void> {
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const contract = Vault__factory.connect(getVaultAddress(chainId), signer);
+
+  const depositInput = {
+    brokerHash: solidityPackedKeccak256(['string'], [brokerId]),
+    tokenAmount: amount,
+    tokenHash: solidityPackedKeccak256(['string'], ['USDC']),
+    accountId
+  } satisfies VaultTypes.VaultDepositFEStruct;
+  const depositFee = await contract.getDepositFee(wallet.accounts[0].address, depositInput);
+
+  await contract.deposit(depositInput, { value: depositFee });
+}
+
 export async function withdraw(
   wallet: WalletState,
   chainId: SupportedChainIds,
