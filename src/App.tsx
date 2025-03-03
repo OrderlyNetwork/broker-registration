@@ -123,19 +123,19 @@ function App() {
           </label>
         </Flex>
 
-        {registrationType === 'eoa' && (
-          <Flex gap="2" align="end">
-            <label>
-              Broker ID
-              <TextField.Root
-                value={brokerId}
-                onChange={(event) => {
-                  setBrokerId(event.target.value);
-                  setAccountId(undefined);
-                }}
-              />
-            </label>
+        <Flex gap="2" align="end">
+          <label>
+            Broker ID
+            <TextField.Root
+              value={brokerId}
+              onChange={(event) => {
+                setBrokerId(event.target.value);
+                setAccountId(undefined);
+              }}
+            />
+          </label>
 
+          {registrationType === 'eoa' && (
             <Button
               disabled={!brokerId || !connectedChain || !isChainSupported}
               onClick={async () => {
@@ -156,8 +156,8 @@ function App() {
             >
               Load Connected Address
             </Button>
-          </Flex>
-        )}
+          )}
+        </Flex>
 
         {registrationType === 'delegatesigner' && (
           <Flex gap="4" align="end">
