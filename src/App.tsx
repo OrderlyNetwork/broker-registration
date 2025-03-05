@@ -1,10 +1,10 @@
 import {
-  Button,
   Callout,
   Container,
   Flex,
   Heading,
   RadioCards,
+  Select,
   Tabs,
   Text,
   TextField
@@ -17,8 +17,10 @@ import { Assets } from './Assets';
 import { DelegateSigner } from './DelegateSigner';
 import { WalletConnection } from './WalletConnection';
 import {
+  BrokerInfo,
   DelegateSignerResponse,
   getAccountId,
+  getBrokers,
   loadOrderlyKey,
   loadBrokerId,
   saveBrokerId,
@@ -29,6 +31,8 @@ import {
 
 function App() {
   const [brokerId, setBrokerId] = useState<string>('');
+  const [brokers, setBrokers] = useState<BrokerInfo[]>([]);
+  const [loadingBrokers, setLoadingBrokers] = useState<boolean>(false);
   const [contractAddress, setContractAddress] = useState<string>('');
   const [accountId, setAccountId] = useState<string>();
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
@@ -47,12 +51,28 @@ function App() {
   useEffect(() => {
     setAccountId(undefined);
     if (connectedChain && supportedChainIds.includes(connectedChain.id as SupportedChainIds)) {
-      setBrokerId(loadBrokerId(connectedChain.id as SupportedChainIds));
+      const savedBrokerId = loadBrokerId(connectedChain.id as SupportedChainIds);
+      setBrokerId(savedBrokerId);
+      if (savedBrokerId && wallet) {
+        if (registrationType === 'eoa') {
+          const userAddress = wallet.accounts[0].address;
+          if (userAddress) {
+            setAccountId(getAccountId(userAddress, savedBrokerId));
+            setShowEOA(true);
+            setActiveTab('account');
+          }
+        } else if (contractAddress) {
+          setAccountId(getAccountId(contractAddress, savedBrokerId));
+          setShowEOA(false);
+          setActiveTab('delegate-signer');
+        }
+      }
     } else {
       setBrokerId('');
       setContractAddress('');
+      setBrokers([]);
     }
-  }, [connectedChain]);
+  }, [connectedChain, wallet, registrationType, contractAddress]);
 
   useEffect(() => {
     if (
@@ -65,6 +85,25 @@ function App() {
       setOrderlyKey(undefined);
     }
   }, [accountId, connectedChain]);
+
+  useEffect(() => {
+    async function loadBrokers() {
+      if (!connectedChain || !supportedChainIds.includes(connectedChain.id as SupportedChainIds)) {
+        setBrokers([]);
+        return;
+      }
+      setLoadingBrokers(true);
+      try {
+        const brokerList = await getBrokers(connectedChain.id as SupportedChainIds);
+        setBrokers(brokerList);
+      } catch (error) {
+        console.error('Failed to load brokers:', error);
+      } finally {
+        setLoadingBrokers(false);
+      }
+    }
+    loadBrokers();
+  }, [connectedChain]);
 
   const isChainSupported = supportedChainIds.includes(connectedChain?.id as SupportedChainIds);
 
@@ -123,40 +162,52 @@ function App() {
           </label>
         </Flex>
 
-        <Flex gap="2" align="end">
+        <Flex direction="column" gap="2">
           <label>
             Broker ID
-            <TextField.Root
+            <br />
+            <Select.Root
               value={brokerId}
-              onChange={(event) => {
-                setBrokerId(event.target.value);
+              onValueChange={(value) => {
+                setBrokerId(value);
                 setAccountId(undefined);
-              }}
-            />
-          </label>
-
-          {registrationType === 'eoa' && (
-            <Button
-              disabled={!brokerId || !connectedChain || !isChainSupported}
-              onClick={async () => {
                 if (
-                  !brokerId ||
-                  !wallet ||
-                  !connectedChain ||
-                  !supportedChainIds.includes(connectedChain.id as SupportedChainIds)
-                )
-                  return;
-                const userAddress = wallet.accounts[0].address;
-                if (!userAddress) return;
-                setAccountId(getAccountId(userAddress, brokerId));
-                saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
-                setShowEOA(true);
-                setActiveTab('account');
+                  value &&
+                  wallet &&
+                  connectedChain &&
+                  supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+                ) {
+                  if (registrationType === 'eoa') {
+                    const userAddress = wallet.accounts[0].address;
+                    if (userAddress) {
+                      setAccountId(getAccountId(userAddress, value));
+                      saveBrokerId(connectedChain.id as SupportedChainIds, value);
+                      setShowEOA(true);
+                      setActiveTab('account');
+                    }
+                  } else if (contractAddress) {
+                    setAccountId(getAccountId(contractAddress, value));
+                    saveBrokerId(connectedChain.id as SupportedChainIds, value);
+                    saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
+                    setShowEOA(false);
+                    setActiveTab('delegate-signer');
+                  }
+                }
               }}
+              disabled={loadingBrokers || !isChainSupported}
             >
-              Load Connected Address
-            </Button>
-          )}
+              <Select.Trigger
+                placeholder={loadingBrokers ? 'Loading brokers...' : 'Select a broker'}
+              />
+              <Select.Content>
+                {brokers.map((broker) => (
+                  <Select.Item key={broker.broker_id} value={broker.broker_id}>
+                    {broker.broker_name}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </label>
         </Flex>
 
         {registrationType === 'delegatesigner' && (
@@ -172,35 +223,21 @@ function App() {
                   }
                   setContractAddress(value);
                   setAccountId(undefined);
+                  if (
+                    value &&
+                    brokerId &&
+                    connectedChain &&
+                    supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+                  ) {
+                    setAccountId(getAccountId(value, brokerId));
+                    saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
+                    saveContractAddress(connectedChain.id as SupportedChainIds, value);
+                    setShowEOA(false);
+                    setActiveTab('delegate-signer');
+                  }
                 }}
               />
             </label>
-
-            <Button
-              disabled={
-                !brokerId ||
-                !contractAddress ||
-                !connectedChain ||
-                contractAddress.toLowerCase() === wallet?.accounts[0].address.toLowerCase() ||
-                !isChainSupported
-              }
-              onClick={async () => {
-                if (
-                  !brokerId ||
-                  !contractAddress ||
-                  !connectedChain ||
-                  !supportedChainIds.includes(connectedChain.id as SupportedChainIds)
-                )
-                  return;
-                setAccountId(getAccountId(contractAddress, brokerId));
-                saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
-                saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
-                setShowEOA(false);
-                setActiveTab('delegate-signer');
-              }}
-            >
-              Load Multisig Address
-            </Button>
           </Flex>
         )}
       </Flex>

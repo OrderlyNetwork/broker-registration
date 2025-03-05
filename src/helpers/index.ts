@@ -26,6 +26,25 @@ import { SupportedChainIds } from './network';
 export * from './constants';
 export * from './network';
 
+export type BrokerInfo = {
+  broker_id: string;
+  broker_name: string;
+};
+
+export async function getBrokers(chainId: SupportedChainIds): Promise<BrokerInfo[]> {
+  const res = await fetch(`${getBaseUrl(chainId)}/v1/public/broker/name`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch brokers');
+  }
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.message);
+  }
+  return json.data.rows.sort((a: BrokerInfo, b: BrokerInfo) =>
+    a.broker_id.localeCompare(b.broker_id)
+  );
+}
+
 export const usdFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
 export type Scope = 'read' | 'read,trading';
