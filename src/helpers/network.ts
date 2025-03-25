@@ -5,6 +5,22 @@ type SupportedChain = Chain & { network: 'mainnet' | 'testnet'; icon: string };
 export const supportedChains = [
   {
     network: 'mainnet',
+    icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
+    id: '0x868B',
+    token: 'ETH',
+    label: 'Mode',
+    rpcUrl: 'https://mainnet.mode.network'
+  },
+  {
+    network: 'testnet',
+    icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
+    id: '0x397',
+    token: 'ETH',
+    label: 'Mode Testnet',
+    rpcUrl: 'https://sepolia.mode.network'
+  },
+  {
+    network: 'mainnet',
     icon: './assets/ethereum.svg',
     id: '0x1',
     token: 'ETH',
