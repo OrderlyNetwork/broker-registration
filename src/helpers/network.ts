@@ -5,22 +5,6 @@ type SupportedChain = Chain & { network: 'mainnet' | 'testnet'; icon: string };
 export const supportedChains = [
   {
     network: 'mainnet',
-    icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
-    id: '0x868B',
-    token: 'ETH',
-    label: 'Mode',
-    rpcUrl: 'https://mainnet.mode.network'
-  },
-  {
-    network: 'testnet',
-    icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
-    id: '0x397',
-    token: 'ETH',
-    label: 'Mode Testnet',
-    rpcUrl: 'https://sepolia.mode.network'
-  },
-  {
-    network: 'mainnet',
     icon: './assets/ethereum.svg',
     id: '0x1',
     token: 'ETH',
@@ -66,6 +50,14 @@ export const supportedChains = [
     token: 'SEI',
     label: 'Sei',
     rpcUrl: 'https://evm-rpc.sei-apis.com'
+  },
+  {
+    network: 'mainnet',
+    icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
+    id: '0x868b',
+    token: 'ETH',
+    label: 'Mode',
+    rpcUrl: 'https://mainnet.mode.network'
   },
   {
     network: 'testnet',
@@ -115,6 +107,14 @@ export const supportedChains = [
     label: 'Sei Devnet',
     rpcUrl: 'https://evm-rpc-arctic-1.sei-apis.com'
   }
+  // {
+  //   network: 'testnet',
+  //   icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
+  //   id: '0x397',
+  //   token: 'ETH',
+  //   label: 'Mode Testnet',
+  //   rpcUrl: 'https://sepolia.mode.network'
+  // }
 ] as const satisfies SupportedChain[];
 
 export const supportedChainIds = supportedChains.map(({ id }) => id);
