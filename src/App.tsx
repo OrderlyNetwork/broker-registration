@@ -40,6 +40,8 @@ function App() {
   const [showEOA, setShowEOA] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
   const [registrationType, setRegistrationType] = useState<'eoa' | 'delegatesigner'>('eoa');
+  const [brokerIdInputMode, setBrokerIdInputMode] = useState<'dropdown' | 'manual'>('dropdown');
+  const [manualBrokerId, setManualBrokerId] = useState<string>('');
 
   const [{ wallet }, connectWallet] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -105,6 +107,31 @@ function App() {
     loadBrokers();
   }, [connectedChain]);
 
+  const updateAccountId = (newBrokerId: string) => {
+    if (
+      newBrokerId &&
+      wallet &&
+      connectedChain &&
+      supportedChainIds.includes(connectedChain.id as SupportedChainIds)
+    ) {
+      if (registrationType === 'eoa') {
+        const userAddress = wallet.accounts[0].address;
+        if (userAddress) {
+          setAccountId(getAccountId(userAddress, newBrokerId));
+          saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
+          setShowEOA(true);
+          setActiveTab('account');
+        }
+      } else if (contractAddress) {
+        setAccountId(getAccountId(contractAddress, newBrokerId));
+        saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
+        saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
+        setShowEOA(false);
+        setActiveTab('delegate-signer');
+      }
+    }
+  };
+
   const isChainSupported = supportedChainIds.includes(connectedChain?.id as SupportedChainIds);
 
   return (
@@ -162,51 +189,92 @@ function App() {
           </label>
         </Flex>
 
-        <Flex direction="column" gap="2">
+        <Flex>
           <label>
             Broker ID
-            <br />
-            <Select.Root
-              value={brokerId}
-              onValueChange={(value) => {
-                setBrokerId(value);
-                setAccountId(undefined);
-                if (
-                  value &&
-                  wallet &&
-                  connectedChain &&
-                  supportedChainIds.includes(connectedChain.id as SupportedChainIds)
-                ) {
-                  if (registrationType === 'eoa') {
-                    const userAddress = wallet.accounts[0].address;
-                    if (userAddress) {
-                      setAccountId(getAccountId(userAddress, value));
-                      saveBrokerId(connectedChain.id as SupportedChainIds, value);
-                      setShowEOA(true);
-                      setActiveTab('account');
-                    }
-                  } else if (contractAddress) {
-                    setAccountId(getAccountId(contractAddress, value));
-                    saveBrokerId(connectedChain.id as SupportedChainIds, value);
-                    saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
-                    setShowEOA(false);
-                    setActiveTab('delegate-signer');
-                  }
-                }
-              }}
-              disabled={loadingBrokers || !isChainSupported}
+            <RadioCards.Root
+              value={brokerIdInputMode}
+              columns={{ initial: '1', sm: '2' }}
+              style={{ marginBottom: '-0.5rem' }}
             >
-              <Select.Trigger
-                placeholder={loadingBrokers ? 'Loading brokers...' : 'Select a broker'}
-              />
-              <Select.Content>
-                {brokers.map((broker) => (
-                  <Select.Item key={broker.broker_id} value={broker.broker_id}>
-                    {broker.broker_name}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+              <RadioCards.Item
+                value="dropdown"
+                onClick={() => {
+                  setBrokerIdInputMode('dropdown');
+                }}
+              >
+                <Flex direction="column" width="100%">
+                  <Text weight="bold">Select from list</Text>
+                </Flex>
+              </RadioCards.Item>
+              <RadioCards.Item
+                value="manual"
+                onClick={() => {
+                  setBrokerIdInputMode('manual');
+                }}
+              >
+                <Flex direction="column" width="100%">
+                  <Text weight="bold">Enter manually</Text>
+                </Flex>
+              </RadioCards.Item>
+            </RadioCards.Root>
+            <br />
+            {brokerIdInputMode === 'dropdown' ? (
+              <Select.Root
+                value={brokerId}
+                onValueChange={(value) => {
+                  setBrokerId(value);
+                  setAccountId(undefined);
+                  updateAccountId(value);
+                }}
+                disabled={loadingBrokers || !isChainSupported}
+              >
+                <Select.Trigger
+                  placeholder={loadingBrokers ? 'Loading brokers...' : 'Select a broker'}
+                />
+                <Select.Content>
+                  {brokers.map((broker) => (
+                    <Select.Item key={broker.broker_id} value={broker.broker_id}>
+                      {broker.broker_name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            ) : (
+              <Flex gap="2" align="end">
+                <TextField.Root
+                  value={manualBrokerId}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setManualBrokerId(value);
+                  }}
+                  placeholder="Enter broker ID"
+                  disabled={!isChainSupported}
+                  style={{ flexGrow: 1 }}
+                />
+                <button
+                  onClick={() => {
+                    if (manualBrokerId) {
+                      setBrokerId(manualBrokerId);
+                      setAccountId(undefined);
+                      updateAccountId(manualBrokerId);
+                    }
+                  }}
+                  disabled={!manualBrokerId || !isChainSupported}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    cursor: manualBrokerId && isChainSupported ? 'pointer' : 'not-allowed',
+                    opacity: manualBrokerId && isChainSupported ? 1 : 0.6
+                  }}
+                >
+                  Load
+                </button>
+              </Flex>
+            )}
           </label>
         </Flex>
 
