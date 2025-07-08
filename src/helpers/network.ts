@@ -53,6 +53,14 @@ export const supportedChains = [
   },
   {
     network: 'mainnet',
+    icon: './assets/bnb.svg',
+    id: '0x38',
+    token: 'BNB',
+    label: 'BSC',
+    rpcUrl: 'https://binance.llamarpc.com'
+  },
+  {
+    network: 'mainnet',
     icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
     id: '0x868b',
     token: 'ETH',
@@ -106,6 +114,14 @@ export const supportedChains = [
     token: 'SEI',
     label: 'Sei Devnet',
     rpcUrl: 'https://evm-rpc-arctic-1.sei-apis.com'
+  },
+  {
+    network: 'testnet',
+    icon: './assets/bnb_testnet.svg',
+    id: '0x61',
+    token: 'BNB',
+    label: 'BSC Testnet',
+    rpcUrl: 'https://bsc-testnet-rpc.publicnode.com'
   }
   // {
   //   network: 'testnet',
