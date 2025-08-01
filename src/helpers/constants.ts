@@ -21,6 +21,8 @@ export function getVaultAddress(chainId: SupportedChainIds): string {
       .with('0x1388', () => '0x816f722424b49cf1275cc86da9840fbd5a6167e9')
       // sei
       .with('0x531', () => '0x816f722424B49Cf1275cc86DA9840Fbd5a6167e9')
+      // bsc
+      .with('0x38', () => '0x816f722424B49Cf1275cc86DA9840Fbd5a6167e9')
       // mode
       .with('0x868b', () => '0x816f722424B49Cf1275cc86DA9840Fbd5a6167e9')
       // sepolia
@@ -35,6 +37,8 @@ export function getVaultAddress(chainId: SupportedChainIds): string {
       .with('0x138b', () => '0xfb0E5f3D16758984E668A3d76f0963710E775503')
       // sei devnet
       .with('0xae3f3', () => '0xA603f6e124259d37e43dd5008cB7613164D6a6e3')
+      // bsc testnet
+      .with('0x61', () => '0xaf2036D5143219fa00dDd90e7A2dbF3E36dba050')
       .exhaustive()
   );
 }
@@ -61,6 +65,8 @@ export function getUSDCAddress(chainId: SupportedChainIds): string {
       .with('0x1388', () => '0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9')
       // sei
       .with('0x531', () => '0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1')
+      // bsc
+      .with('0x38', () => '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d')
       // mode
       .with('0x868b', () => '0xd988097fb8612cc24eeC14542bC03424c656005f')
       // sepolia
@@ -75,6 +81,8 @@ export function getUSDCAddress(chainId: SupportedChainIds): string {
       .with('0x138b', () => '0xAcab8129E2cE587fD203FD770ec9ECAFA2C88080')
       // sei devnet
       .with('0xae3f3', () => '0xd5164A5a83c64E59F842bC091E06614b84D95fF5')
+      // bsc testnet
+      .with('0x61', () => '0x31873b5804bABE258d6ea008f55e08DD00b7d51E')
       .exhaustive()
   );
 }
