@@ -1,9 +1,10 @@
 import { match } from 'ts-pattern';
 
-import { SupportedChainIds, supportedChains } from './network';
+import { SupportedChainIds } from './network';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isTestnet(chainId: string): boolean {
-  return supportedChains.find((chain) => chain.id === chainId)?.network === 'testnet';
+  return false;
 }
 
 export function getVaultAddress(chainId: SupportedChainIds): string {
@@ -25,20 +26,6 @@ export function getVaultAddress(chainId: SupportedChainIds): string {
       .with('0x38', () => '0x816f722424B49Cf1275cc86DA9840Fbd5a6167e9')
       // mode
       .with('0x868b', () => '0x816f722424B49Cf1275cc86DA9840Fbd5a6167e9')
-      // sepolia
-      .with('0xaa36a7', () => '0x0EaC556c0C2321BA25b9DC01e4e3c95aD5CDCd2f')
-      // arbitrum sepolia
-      .with('0x66eee', () => '0x0EaC556c0C2321BA25b9DC01e4e3c95aD5CDCd2f')
-      // optimism sepolia
-      .with('0xaa37dc', () => '0xEfF2896077B6ff95379EfA89Ff903598190805EC')
-      // base sepolia
-      .with('0x14a34', () => '0xdc7348975aE9334DbdcB944DDa9163Ba8406a0ec')
-      // mantle sepolia
-      .with('0x138b', () => '0xfb0E5f3D16758984E668A3d76f0963710E775503')
-      // sei devnet
-      .with('0xae3f3', () => '0xA603f6e124259d37e43dd5008cB7613164D6a6e3')
-      // bsc testnet
-      .with('0x61', () => '0xaf2036D5143219fa00dDd90e7A2dbF3E36dba050')
       .exhaustive()
   );
 }
@@ -69,20 +56,6 @@ export function getUSDCAddress(chainId: SupportedChainIds): string {
       .with('0x38', () => '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d')
       // mode
       .with('0x868b', () => '0xd988097fb8612cc24eeC14542bC03424c656005f')
-      // sepolia
-      .with('0xaa36a7', () => '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238')
-      // arbitrum sepolia
-      .with('0x66eee', () => '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d')
-      // optimism sepolia
-      .with('0xaa37dc', () => '0x5fd84259d66Cd46123540766Be93DFE6D43130D7')
-      // base sepolia
-      .with('0x14a34', () => '0x036CbD53842c5426634e7929541eC2318f3dCF7e')
-      // mantle sepolia
-      .with('0x138b', () => '0xAcab8129E2cE587fD203FD770ec9ECAFA2C88080')
-      // sei devnet
-      .with('0xae3f3', () => '0xd5164A5a83c64E59F842bC091E06614b84D95fF5')
-      // bsc testnet
-      .with('0x61', () => '0x31873b5804bABE258d6ea008f55e08DD00b7d51E')
       .exhaustive()
   );
 }
