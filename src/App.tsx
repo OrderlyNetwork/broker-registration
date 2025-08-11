@@ -4,7 +4,6 @@ import {
   Flex,
   Heading,
   RadioCards,
-  Select,
   Tabs,
   Text,
   TextField
@@ -17,22 +16,16 @@ import { Assets } from './Assets';
 import { DelegateSigner } from './DelegateSigner';
 import { WalletConnection } from './WalletConnection';
 import {
-  BrokerInfo,
   DelegateSignerResponse,
   getAccountId,
-  getBrokers,
   loadOrderlyKey,
-  loadBrokerId,
-  saveBrokerId,
   saveContractAddress,
   supportedChainIds,
   SupportedChainIds
 } from './helpers';
 
 function App() {
-  const [brokerId, setBrokerId] = useState<string>('');
-  const [brokers, setBrokers] = useState<BrokerInfo[]>([]);
-  const [loadingBrokers, setLoadingBrokers] = useState<boolean>(false);
+  const brokerId = 'aden'; // Hard coded broker ID
   const [contractAddress, setContractAddress] = useState<string>('');
   const [accountId, setAccountId] = useState<string>();
   const [delegateSigner, setDelegateSigner] = useState<DelegateSignerResponse>();
@@ -40,8 +33,6 @@ function App() {
   const [showEOA, setShowEOA] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('account');
   const [registrationType, setRegistrationType] = useState<'eoa' | 'delegatesigner'>('eoa');
-  const [brokerIdInputMode, setBrokerIdInputMode] = useState<'dropdown' | 'manual'>('dropdown');
-  const [manualBrokerId, setManualBrokerId] = useState<string>('');
 
   const [{ wallet }, connectWallet] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -53,28 +44,24 @@ function App() {
   useEffect(() => {
     setAccountId(undefined);
     if (connectedChain && supportedChainIds.includes(connectedChain.id as SupportedChainIds)) {
-      const savedBrokerId = loadBrokerId(connectedChain.id as SupportedChainIds);
-      setBrokerId(savedBrokerId);
-      if (savedBrokerId && wallet) {
+      if (wallet) {
         if (registrationType === 'eoa') {
           const userAddress = wallet.accounts[0].address;
           if (userAddress) {
-            setAccountId(getAccountId(userAddress, savedBrokerId));
+            setAccountId(getAccountId(userAddress, brokerId));
             setShowEOA(true);
             setActiveTab('account');
           }
         } else if (contractAddress) {
-          setAccountId(getAccountId(contractAddress, savedBrokerId));
+          setAccountId(getAccountId(contractAddress, brokerId));
           setShowEOA(false);
           setActiveTab('delegate-signer');
         }
       }
     } else {
-      setBrokerId('');
       setContractAddress('');
-      setBrokers([]);
     }
-  }, [connectedChain, wallet, registrationType, contractAddress]);
+  }, [connectedChain, wallet, registrationType, contractAddress, brokerId]);
 
   useEffect(() => {
     if (
@@ -88,50 +75,6 @@ function App() {
     }
   }, [accountId, connectedChain]);
 
-  useEffect(() => {
-    async function loadBrokers() {
-      if (!connectedChain || !supportedChainIds.includes(connectedChain.id as SupportedChainIds)) {
-        setBrokers([]);
-        return;
-      }
-      setLoadingBrokers(true);
-      try {
-        const brokerList = await getBrokers(connectedChain.id as SupportedChainIds);
-        setBrokers(brokerList);
-      } catch (error) {
-        console.error('Failed to load brokers:', error);
-      } finally {
-        setLoadingBrokers(false);
-      }
-    }
-    loadBrokers();
-  }, [connectedChain]);
-
-  const updateAccountId = (newBrokerId: string) => {
-    if (
-      newBrokerId &&
-      wallet &&
-      connectedChain &&
-      supportedChainIds.includes(connectedChain.id as SupportedChainIds)
-    ) {
-      if (registrationType === 'eoa') {
-        const userAddress = wallet.accounts[0].address;
-        if (userAddress) {
-          setAccountId(getAccountId(userAddress, newBrokerId));
-          saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
-          setShowEOA(true);
-          setActiveTab('account');
-        }
-      } else if (contractAddress) {
-        setAccountId(getAccountId(contractAddress, newBrokerId));
-        saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
-        saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
-        setShowEOA(false);
-        setActiveTab('delegate-signer');
-      }
-    }
-  };
-
   const isChainSupported = supportedChainIds.includes(connectedChain?.id as SupportedChainIds);
 
   return (
@@ -144,10 +87,10 @@ function App() {
 
       <Text>
         This app lets you register an account in the Orderly Network infrastructure with any wallet
-        address and any broker ID. The address can be a smart contract account (via Delegate Signer
+        address and broker ID "aden". The address can be a smart contract account (via Delegate Signer
         feature) or an EOA user address. The source code is available on{' '}
         <a
-          href="https://github.com/OrderlyNetwork/broker-registration"
+          href="https://github.com/OrderlyNetwork/broker-registration-aden"
           target="_blank"
           rel="noopener"
         >
@@ -189,95 +132,6 @@ function App() {
           </label>
         </Flex>
 
-        <Flex>
-          <label>
-            Broker ID
-            <RadioCards.Root
-              value={brokerIdInputMode}
-              columns={{ initial: '1', sm: '2' }}
-              style={{ marginBottom: '-0.5rem' }}
-            >
-              <RadioCards.Item
-                value="dropdown"
-                onClick={() => {
-                  setBrokerIdInputMode('dropdown');
-                }}
-              >
-                <Flex direction="column" width="100%">
-                  <Text weight="bold">Select from list</Text>
-                </Flex>
-              </RadioCards.Item>
-              <RadioCards.Item
-                value="manual"
-                onClick={() => {
-                  setBrokerIdInputMode('manual');
-                }}
-              >
-                <Flex direction="column" width="100%">
-                  <Text weight="bold">Enter manually</Text>
-                </Flex>
-              </RadioCards.Item>
-            </RadioCards.Root>
-            <br />
-            {brokerIdInputMode === 'dropdown' ? (
-              <Select.Root
-                value={brokerId}
-                onValueChange={(value) => {
-                  setBrokerId(value);
-                  setAccountId(undefined);
-                  updateAccountId(value);
-                }}
-                disabled={loadingBrokers || !isChainSupported}
-              >
-                <Select.Trigger
-                  placeholder={loadingBrokers ? 'Loading brokers...' : 'Select a broker'}
-                />
-                <Select.Content>
-                  {brokers.map((broker) => (
-                    <Select.Item key={broker.broker_id} value={broker.broker_id}>
-                      {broker.broker_name}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Root>
-            ) : (
-              <Flex gap="2" align="end">
-                <TextField.Root
-                  value={manualBrokerId}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    setManualBrokerId(value);
-                  }}
-                  placeholder="Enter broker ID"
-                  disabled={!isChainSupported}
-                  style={{ flexGrow: 1 }}
-                />
-                <button
-                  onClick={() => {
-                    if (manualBrokerId) {
-                      setBrokerId(manualBrokerId);
-                      setAccountId(undefined);
-                      updateAccountId(manualBrokerId);
-                    }
-                  }}
-                  disabled={!manualBrokerId || !isChainSupported}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    cursor: manualBrokerId && isChainSupported ? 'pointer' : 'not-allowed',
-                    opacity: manualBrokerId && isChainSupported ? 1 : 0.6
-                  }}
-                >
-                  Load
-                </button>
-              </Flex>
-            )}
-          </label>
-        </Flex>
-
         {registrationType === 'delegatesigner' && (
           <Flex gap="4" align="end">
             <label>
@@ -293,12 +147,10 @@ function App() {
                   setAccountId(undefined);
                   if (
                     value &&
-                    brokerId &&
                     connectedChain &&
                     supportedChainIds.includes(connectedChain.id as SupportedChainIds)
                   ) {
                     setAccountId(getAccountId(value, brokerId));
-                    saveBrokerId(connectedChain.id as SupportedChainIds, brokerId);
                     saveContractAddress(connectedChain.id as SupportedChainIds, value);
                     setShowEOA(false);
                     setActiveTab('delegate-signer');
@@ -358,7 +210,7 @@ function App() {
         </Tabs.Root>
       ) : (
         <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
-          <Callout.Text>Please insert your Broker ID and Wallet Address.</Callout.Text>
+          <Callout.Text>Please connect your wallet and provide the required information.</Callout.Text>
         </Callout.Root>
       )}
 
