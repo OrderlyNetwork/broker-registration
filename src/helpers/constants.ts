@@ -3,7 +3,7 @@ import { match } from 'ts-pattern';
 import { SupportedChainIds } from './network';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function isTestnet(chainId: string): boolean {
+export function isTestnet(_chainId: string): boolean {
   return false;
 }
 
