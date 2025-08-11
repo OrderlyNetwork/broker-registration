@@ -66,71 +66,7 @@ export const supportedChains = [
     token: 'ETH',
     label: 'Mode',
     rpcUrl: 'https://mainnet.mode.network'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/sepolia.svg',
-    id: '0xaa36a7',
-    token: 'ETH',
-    label: 'Sepolia',
-    rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/arbitrum_sepolia.svg',
-    id: '0x66eee',
-    token: 'ETH',
-    label: 'Arbitrum Sepolia',
-    rpcUrl: 'https://arbitrum-sepolia.publicnode.com'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/optimism_sepolia.svg',
-    id: '0xaa37dc',
-    token: 'ETH',
-    label: 'OP Sepolia',
-    rpcUrl: 'https://optimism-sepolia.publicnode.com'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/base_sepolia.svg',
-    id: '0x14a34',
-    token: 'ETH',
-    label: 'Base Sepolia',
-    rpcUrl: 'https://base-sepolia-rpc.publicnode.com'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/mantle_sepolia.svg',
-    id: '0x138b',
-    token: 'MNT',
-    label: 'Mantle Sepolia',
-    rpcUrl: 'https://rpc.sepolia.mantle.xyz'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/sei_testnet.svg',
-    id: '0xae3f3',
-    token: 'SEI',
-    label: 'Sei Devnet',
-    rpcUrl: 'https://evm-rpc-arctic-1.sei-apis.com'
-  },
-  {
-    network: 'testnet',
-    icon: './assets/bnb_testnet.svg',
-    id: '0x61',
-    token: 'BNB',
-    label: 'BSC Testnet',
-    rpcUrl: 'https://bsc-testnet-rpc.publicnode.com'
   }
-  // {
-  //   network: 'testnet',
-  //   icon: 'https://app.mode.network/assets/icons/mode_yellow.svg',
-  //   id: '0x397',
-  //   token: 'ETH',
-  //   label: 'Mode Testnet',
-  //   rpcUrl: 'https://sepolia.mode.network'
-  // }
 ] as const satisfies SupportedChain[];
 
 export const supportedChainIds = supportedChains.map(({ id }) => id);
