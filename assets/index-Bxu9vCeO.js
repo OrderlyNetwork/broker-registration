@@ -1,4 +1,4 @@
-import{B as a}from"./index-nhFVUM35.js";import{P as f,b as s,d,e as c,f as l,a as m,p,v}from"./index-nhFVUM35.js";const t=`
+import{B as a}from"./index-BVRR3Akw.js";import{P as f,b as s,d,e as c,f as l,a as m,p,v}from"./index-BVRR3Akw.js";const t=`
 @font-face {
   font-family: 'Inter';
   font-style:  normal;
