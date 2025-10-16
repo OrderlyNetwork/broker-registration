@@ -181,6 +181,20 @@ export const Account: FC<{
             >
               read,trading
             </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                setScope('read,asset');
+              }}
+            >
+              read,asset
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => {
+                setScope('read,trading,asset');
+              }}
+            >
+              read,trading,asset
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
