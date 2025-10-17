@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           yarn install
-          yarn build --base /broker-registration-aden
+          yarn build --base /broker-registration
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
