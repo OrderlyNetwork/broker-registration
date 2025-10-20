@@ -56,6 +56,34 @@ export const WalletConnection: FC = () => {
             </DropdownMenu.Item>
           ))}
         <DropdownMenu.Separator />
+        <DropdownMenu.Label>Testnet</DropdownMenu.Label>
+        {supportedChains
+          .filter(({ network }) => network === 'testnet')
+          .map(({ id, icon, label }) => (
+            <DropdownMenu.Item
+              key={id}
+              onSelect={selectChain(id)}
+              style={{
+                backgroundColor: connectedChain?.id === id ? 'lightgrey' : undefined,
+                color: connectedChain?.id === id ? 'black' : undefined,
+                fontWeight: connectedChain?.id === id ? '600' : undefined
+              }}
+            >
+              <img
+                src={icon}
+                alt={label}
+                style={{
+                  marginRight: '0.3rem',
+                  height: '1.8rem',
+                  width: '1.8rem',
+                  backgroundColor: '#bbb',
+                  borderRadius: '50%'
+                }}
+              />
+              {label}
+            </DropdownMenu.Item>
+          ))}
+        <DropdownMenu.Separator />
         <DropdownMenu.Item
           onSelect={() => {
             disconnectWallet({ label: wallet.label });
