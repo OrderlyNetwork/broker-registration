@@ -118,3 +118,10 @@ export function getOnChainDomain(chainId: SupportedChainIds): EIP712Domain {
     verifyingContract: getVerifyingAddress(chainId)
   };
 }
+
+export function getUSDCDecimals(chainId: SupportedChainIds): number {
+  return match(chainId as SupportedChainIds)
+    .with('0x38', () => 18)
+    .with('0x61', () => 18)
+    .otherwise(() => 6);
+}

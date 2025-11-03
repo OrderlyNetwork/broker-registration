@@ -16,7 +16,8 @@ import {
   getUnsettledPnL,
   withdraw,
   SupportedChainIds,
-  deposit
+  deposit,
+  getUSDCDecimals
 } from './helpers';
 
 export const Assets: FC<{
@@ -37,10 +38,14 @@ export const Assets: FC<{
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
 
+  const usdcDecimals = connectedChain
+    ? getUSDCDecimals(connectedChain.id as SupportedChainIds)
+    : 6;
+
   let needsApproval = false;
   if (allowance != null && amount != null) {
     try {
-      needsApproval = allowance < parseUnits(amount, 6);
+      needsApproval = allowance < parseUnits(amount, usdcDecimals);
     } catch {
       // NaN
     }
@@ -152,7 +157,7 @@ export const Assets: FC<{
           <Table.Row>
             <Table.RowHeaderCell>Connected Wallet Balance (USDC):</Table.RowHeaderCell>
             <Table.Cell>
-              {balance != null ? usdFormatter.format(Number(formatUnits(balance, 6))) : '-'}
+              {balance != null ? usdFormatter.format(Number(formatUnits(balance, usdcDecimals))) : '-'}
             </Table.Cell>
           </Table.Row>
           {!showEOA && (
@@ -160,7 +165,7 @@ export const Assets: FC<{
               <Table.RowHeaderCell>Delegate Signer Balance (USDC):</Table.RowHeaderCell>
               <Table.Cell>
                 {contractBalance != null
-                  ? usdFormatter.format(Number(formatUnits(contractBalance, 6)))
+                  ? usdFormatter.format(Number(formatUnits(contractBalance, usdcDecimals)))
                   : '-'}
               </Table.Cell>
             </Table.Row>
@@ -202,7 +207,7 @@ export const Assets: FC<{
               !connectedChain ||
               !brokerId ||
               !balance ||
-              balance < parseUnits(amount, 6)
+              balance < parseUnits(amount, usdcDecimals)
             }
             onClick={async () => {
               if (
@@ -215,7 +220,7 @@ export const Assets: FC<{
                 !balance
               )
                 return;
-              const amountBN = parseUnits(amount, 6);
+              const amountBN = parseUnits(amount, usdcDecimals);
               if (balance < amountBN) return;
               if (allowance < amountBN) {
                 await usdcContract.approve(
@@ -250,7 +255,7 @@ export const Assets: FC<{
               !connectedChain ||
               !brokerId ||
               !balance ||
-              balance < parseUnits(amount, 6)
+              balance < parseUnits(amount, usdcDecimals)
             }
             onClick={async () => {
               if (
@@ -263,7 +268,7 @@ export const Assets: FC<{
                 !balance
               )
                 return;
-              const amountBN = parseUnits(amount, 6);
+              const amountBN = parseUnits(amount, usdcDecimals);
               if (balance < amountBN) return;
               if (allowance < amountBN) {
                 await usdcContract.approve(
@@ -297,8 +302,8 @@ export const Assets: FC<{
             disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
             onClick={async () => {
               if (!wallet || !connectedChain || !orderlyKey || !amount) return;
-              const amountBN = parseUnits(amount, 6);
-              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              const amountBN = parseUnits(amount, usdcDecimals);
+              if (parseUnits(String(vaultBalance), usdcDecimals) < amountBN) return;
               await withdraw(
                 wallet,
                 connectedChain.id as SupportedChainIds,
@@ -320,13 +325,13 @@ export const Assets: FC<{
               !orderlyKey ||
               !amount ||
               !brokerId ||
-              parseUnits(String(vaultBalance), 6) < parseUnits(amount, 6) ||
-              parseUnits(amount, 6) < 2_500_000n // fee
+              parseUnits(String(vaultBalance), usdcDecimals) < parseUnits(amount, usdcDecimals) ||
+              parseUnits(amount, usdcDecimals) < (usdcDecimals === 18 ? 2_500_000_000_000_000_000n : 2_500_000n) // fee
             }
             onClick={async () => {
               if (!wallet || !connectedChain || !orderlyKey || !amount) return;
-              const amountBN = parseUnits(amount, 6);
-              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              const amountBN = parseUnits(amount, usdcDecimals);
+              if (parseUnits(String(vaultBalance), usdcDecimals) < amountBN) return;
               await delegateWithdraw(
                 wallet,
                 connectedChain.id as SupportedChainIds,
