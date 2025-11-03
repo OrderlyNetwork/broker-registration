@@ -43,7 +43,7 @@ export const Assets: FC<{
     : 6;
 
   let needsApproval = false;
-  if (allowance != null && amount != null) {
+  if (allowance != null && amount != null && connectedChain) {
     try {
       needsApproval = allowance < parseUnits(amount, usdcDecimals);
     } catch {
@@ -302,8 +302,8 @@ export const Assets: FC<{
             disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
             onClick={async () => {
               if (!wallet || !connectedChain || !orderlyKey || !amount) return;
-              const amountBN = parseUnits(amount, usdcDecimals);
-              if (parseUnits(String(vaultBalance), usdcDecimals) < amountBN) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
               await withdraw(
                 wallet,
                 connectedChain.id as SupportedChainIds,
@@ -325,13 +325,13 @@ export const Assets: FC<{
               !orderlyKey ||
               !amount ||
               !brokerId ||
-              parseUnits(String(vaultBalance), usdcDecimals) < parseUnits(amount, usdcDecimals) ||
-              parseUnits(amount, usdcDecimals) < (usdcDecimals === 18 ? 2_500_000_000_000_000_000n : 2_500_000n) // fee
+              parseUnits(String(vaultBalance), 6) < parseUnits(amount, 6) ||
+              parseUnits(amount, 6) < 2_500_000n // fee
             }
             onClick={async () => {
               if (!wallet || !connectedChain || !orderlyKey || !amount) return;
-              const amountBN = parseUnits(amount, usdcDecimals);
-              if (parseUnits(String(vaultBalance), usdcDecimals) < amountBN) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
               await delegateWithdraw(
                 wallet,
                 connectedChain.id as SupportedChainIds,
