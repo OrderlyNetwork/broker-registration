@@ -4,18 +4,24 @@ import { FC } from 'react';
 
 import { ConnectWalletButton } from './ConnectWalletButton';
 import { supportedChains } from './helpers';
+import { useToast } from './Toast';
 
 export const WalletConnection: FC = () => {
   const [{ wallet }, _, disconnectWallet] = useConnectWallet();
   const [{ connectedChain }, setChain] = useSetChain();
+  const { showToast } = useToast();
 
   const chainIcon =
     supportedChains.find(({ id }) => id === connectedChain?.id)?.icon ?? '/assets/questionmark.svg';
 
   const selectChain = (chainId: string) => () => {
+    const chain = supportedChains.find(({ id }) => id === chainId);
     setChain({
       chainId
     });
+    if (chain) {
+      showToast(`Switched to ${chain.label}`);
+    }
   };
 
   return wallet ? (
@@ -87,6 +93,7 @@ export const WalletConnection: FC = () => {
         <DropdownMenu.Item
           onSelect={() => {
             disconnectWallet({ label: wallet.label });
+            showToast('Wallet disconnected');
           }}
         >
           Disconnect
