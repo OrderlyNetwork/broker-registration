@@ -24,6 +24,7 @@ import {
   Scope,
   SupportedChainIds
 } from './helpers';
+import { useToast } from './Toast';
 
 export const DelegateSigner: FC<{
   brokerId: string;
@@ -48,6 +49,7 @@ export const DelegateSigner: FC<{
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function run() {
@@ -169,7 +171,12 @@ export const DelegateSigner: FC<{
                       variant="soft"
                       onClick={async () => {
                         if (publicKey == null) return;
-                        navigator.clipboard.writeText(publicKey);
+                        try {
+                          await navigator.clipboard.writeText(publicKey);
+                          showToast('Public key copied to clipboard');
+                        } catch (error) {
+                          showToast('Failed to copy public key', 'error');
+                        }
                       }}
                     >
                       <CopyIcon height="12" />
@@ -191,7 +198,12 @@ export const DelegateSigner: FC<{
                       variant="soft"
                       onClick={async () => {
                         if (privateKey == null) return;
-                        navigator.clipboard.writeText(privateKey);
+                        try {
+                          await navigator.clipboard.writeText(privateKey);
+                          showToast('Private key copied to clipboard');
+                        } catch (error) {
+                          showToast('Failed to copy private key', 'error');
+                        }
                       }}
                     >
                       <CopyIcon height="12" />
@@ -224,14 +236,19 @@ export const DelegateSigner: FC<{
           disabled={!wallet || !connectedChain || !brokerId || !txHash}
           onClick={async () => {
             if (!wallet || !connectedChain || !brokerId || !txHash) return;
-            const res = await announceDelegateSigner(
-              wallet,
-              connectedChain.id as SupportedChainIds,
-              brokerId,
-              contractAddress,
-              txHash
-            );
-            setDelegateSigner(res);
+            try {
+              const res = await announceDelegateSigner(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                contractAddress,
+                txHash
+              );
+              setDelegateSigner(res);
+              showToast('Delegate Signer link accepted successfully');
+            } catch (error) {
+              showToast(`Failed to accept Delegate Signer link: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+            }
           }}
         >
           Accept Delegate Signer Link
@@ -270,15 +287,20 @@ export const DelegateSigner: FC<{
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          const key = await delegateAddOrderlyKey(
-            wallet,
-            connectedChain.id as SupportedChainIds,
-            brokerId,
-            contractAddress,
-            accountId,
-            scope
-          );
-          setOrderlyKey(key);
+          try {
+            const key = await delegateAddOrderlyKey(
+              wallet,
+              connectedChain.id as SupportedChainIds,
+              brokerId,
+              contractAddress,
+              accountId,
+              scope
+            );
+            setOrderlyKey(key);
+            showToast('Delegate Orderly key created successfully');
+          } catch (error) {
+            showToast(`Failed to create Delegate Orderly key: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+          }
         }}
       >
         Create Delegate Orderly Key

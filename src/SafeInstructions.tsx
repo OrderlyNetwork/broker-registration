@@ -17,6 +17,7 @@ import { solidityPackedKeccak256 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
 import { getVaultAddress, SupportedChainIds } from './helpers';
+import { useToast } from './Toast';
 
 export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
   brokerId,
@@ -25,6 +26,7 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
   const [abi, setAbi] = useState<string>();
 
   const [{ wallet }] = useConnectWallet();
+  const { showToast } = useToast();
 
   useEffect(() => {
     async function run() {
@@ -79,8 +81,13 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                   <IconButton
                     size="1"
                     variant="soft"
-                    onClick={() => {
-                      navigator.clipboard.writeText(getVaultAddress(chainId as SupportedChainIds));
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(getVaultAddress(chainId as SupportedChainIds));
+                        showToast('Vault address copied to clipboard');
+                      } catch (error) {
+                        showToast('Failed to copy vault address', 'error');
+                      }
                     }}
                   >
                     <CopyIcon height="12" />
@@ -92,9 +99,14 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                   <IconButton
                     size="1"
                     variant="soft"
-                    onClick={() => {
+                    onClick={async () => {
                       if (!abi) return;
-                      navigator.clipboard.writeText(abi);
+                      try {
+                        await navigator.clipboard.writeText(abi);
+                        showToast('ABI copied to clipboard');
+                      } catch (error) {
+                        showToast('Failed to copy ABI', 'error');
+                      }
                     }}
                   >
                     <CopyIcon height="12" />
@@ -111,8 +123,13 @@ export const SafeInstructions: FC<{ brokerId: string; chainId: string }> = ({
                   <IconButton
                     size="1"
                     variant="soft"
-                    onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(data));
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(JSON.stringify(data));
+                        showToast('Data tuple copied to clipboard');
+                      } catch (error) {
+                        showToast('Failed to copy data tuple', 'error');
+                      }
                     }}
                   >
                     <CopyIcon height="12" />
