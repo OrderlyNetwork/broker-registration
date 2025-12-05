@@ -235,7 +235,7 @@ function App() {
                 <Select.Content>
                   {brokers.map((broker) => (
                     <Select.Item key={broker.broker_id} value={broker.broker_id}>
-                      {broker.broker_name}
+                      {broker.broker_id}
                     </Select.Item>
                   ))}
                 </Select.Content>
