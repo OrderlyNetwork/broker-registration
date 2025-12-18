@@ -15,7 +15,6 @@ import { encodeBase58 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
 import { registerAccount, addOrderlyKey, getBaseUrl, Scope, SupportedChainIds } from './helpers';
-import { useToast } from './Toast';
 
 export const Account: FC<{
   brokerId: string;
@@ -29,7 +28,6 @@ export const Account: FC<{
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
-  const { showToast } = useToast();
 
   useEffect(() => {
     async function run() {
@@ -109,12 +107,7 @@ export const Account: FC<{
                       variant="soft"
                       onClick={async () => {
                         if (publicKey == null) return;
-                        try {
-                          await navigator.clipboard.writeText(publicKey);
-                          showToast('Public key copied to clipboard');
-                        } catch (error) {
-                          showToast('Failed to copy public key', 'error');
-                        }
+                        navigator.clipboard.writeText(publicKey);
                       }}
                     >
                       <CopyIcon height="12" />
@@ -136,12 +129,7 @@ export const Account: FC<{
                       variant="soft"
                       onClick={async () => {
                         if (privateKey == null) return;
-                        try {
-                          await navigator.clipboard.writeText(privateKey);
-                          showToast('Private key copied to clipboard');
-                        } catch (error) {
-                          showToast('Failed to copy private key', 'error');
-                        }
+                        navigator.clipboard.writeText(privateKey);
                       }}
                     >
                       <CopyIcon height="12" />
@@ -162,13 +150,8 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId || isRegistered}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          try {
-            await registerAccount(wallet, connectedChain.id as SupportedChainIds, brokerId);
-            setIsRegistered(true);
-            showToast('Account registered successfully');
-          } catch (error) {
-            showToast(`Failed to register account: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-          }
+          await registerAccount(wallet, connectedChain.id as SupportedChainIds, brokerId);
+          setIsRegistered(true);
         }}
       >
         Register Account
@@ -220,19 +203,14 @@ export const Account: FC<{
         disabled={!wallet || !connectedChain || !brokerId}
         onClick={async () => {
           if (!wallet || !connectedChain || !brokerId) return;
-          try {
-            const key = await addOrderlyKey(
-              wallet,
-              connectedChain.id as SupportedChainIds,
-              brokerId,
-              scope,
-              accountId
-            );
-            setOrderlyKey(key);
-            showToast('Orderly key created successfully');
-          } catch (error) {
-            showToast(`Failed to create Orderly key: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-          }
+          const key = await addOrderlyKey(
+            wallet,
+            connectedChain.id as SupportedChainIds,
+            brokerId,
+            scope,
+            accountId
+          );
+          setOrderlyKey(key);
         }}
       >
         Create Orderly Key

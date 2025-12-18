@@ -8,7 +8,6 @@ import ReactDOM from 'react-dom/client';
 
 import App from './App.tsx';
 import { supportedChains } from './helpers';
-import { ToastProvider } from './Toast';
 
 import './index.css';
 import '@radix-ui/themes/styles.css';
@@ -44,9 +43,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Theme>
       <Web3OnboardProvider web3Onboard={web3Onboard}>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
+        <App />
       </Web3OnboardProvider>
     </Theme>
   </React.StrictMode>

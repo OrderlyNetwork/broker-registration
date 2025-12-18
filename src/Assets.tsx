@@ -1,4 +1,4 @@
-import { Button, Callout, DropdownMenu, Flex, Heading, Tabs, Text, TextField } from '@radix-ui/themes';
+import { Button, Callout, Flex, Heading, Table, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
 import { FC, useEffect, useState } from 'react';
@@ -17,11 +17,8 @@ import {
   withdraw,
   SupportedChainIds,
   deposit,
-  getUSDCDecimals,
-  getWithdrawFee,
-  supportedChains
+  getUSDCDecimals
 } from './helpers';
-import { useToast } from './Toast';
 
 export const Assets: FC<{
   brokerId: string;
@@ -30,18 +27,16 @@ export const Assets: FC<{
   showEOA: boolean;
   orderlyKey?: Uint8Array;
 }> = ({ brokerId, accountId, contractAddress, showEOA, orderlyKey }) => {
-  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw'>('deposit');
   const [amount, setAmount] = useState<string>('');
   const [balance, setBalance] = useState<bigint>();
   const [allowance, setAllowance] = useState<bigint>();
+  const [contractBalance, setContractBalance] = useState<bigint>();
   const [vaultBalance, setVaultBalance] = useState<number>();
   const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
   const [unsettledPnL, setUnsettledPnL] = useState<number>();
-  const [withdrawFee, setWithdrawFee] = useState<number>();
 
   const [{ wallet }] = useConnectWallet();
-  const [{ connectedChain }, setChain] = useSetChain();
-  const { showToast } = useToast();
+  const [{ connectedChain }] = useSetChain();
 
   const usdcDecimals = connectedChain
     ? getUSDCDecimals(connectedChain.id as SupportedChainIds)
@@ -55,25 +50,6 @@ export const Assets: FC<{
       // NaN
     }
   }
-
-  const chainIcon =
-    supportedChains.find(({ id }) => id === connectedChain?.id)?.icon ?? '/assets/questionmark.svg';
-  const chainLabel = supportedChains.find(({ id }) => id === connectedChain?.id)?.label ?? 'Unknown';
-
-  const selectChain = (chainId: string) => () => {
-    const chain = supportedChains.find(({ id }) => id === chainId);
-    setChain({
-      chainId
-    });
-    if (chain) {
-      showToast(`Switched to ${chain.label}`);
-    }
-  };
-
-  const netWithdrawAmount =
-    amount && withdrawFee != null
-      ? Math.max(0, parseFloat(amount) - withdrawFee)
-      : undefined;
 
   useEffect(() => {
     async function run() {
@@ -113,6 +89,22 @@ export const Assets: FC<{
     return () => clearInterval(interval);
   }, [wallet, usdcContract, connectedChain]);
 
+  useEffect(() => {
+    if (!usdcContract || !contractAddress) {
+      setContractBalance(undefined);
+      return;
+    }
+    const fetchContractBalance = async () => {
+      if (!usdcContract || !contractAddress) {
+        setContractBalance(undefined);
+        return;
+      }
+      usdcContract.balanceOf(contractAddress).then(setContractBalance);
+    };
+    const interval = setInterval(fetchContractBalance, 5_000);
+    fetchContractBalance();
+    return () => clearInterval(interval);
+  }, [usdcContract, contractAddress]);
 
   useEffect(() => {
     if (!connectedChain || !orderlyKey) {
@@ -148,410 +140,249 @@ export const Assets: FC<{
     return () => clearInterval(interval);
   }, [connectedChain, accountId, orderlyKey]);
 
-  useEffect(() => {
-    if (!connectedChain) {
-      setWithdrawFee(undefined);
-      return;
-    }
-    const fetchWithdrawFee = async () => {
-      if (!connectedChain) {
-        setWithdrawFee(undefined);
-        return;
-      }
-      const fee = await getWithdrawFee(connectedChain.id as SupportedChainIds);
-      console.log('fee', fee)
-      setWithdrawFee(fee);
-    };
-    fetchWithdrawFee();
-  }, [connectedChain]);
-
-  const handleSettlePnL = async () => {
-    if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
-    try {
-      if (showEOA) {
-        await settlePnL(
-          wallet,
-          connectedChain.id as SupportedChainIds,
-          brokerId,
-          accountId,
-          orderlyKey
-        );
-      } else {
-        await delegateSettlePnL(
-          wallet,
-          connectedChain.id as SupportedChainIds,
-          brokerId,
-          contractAddress,
-          accountId,
-          orderlyKey
-        );
-      }
-      showToast('Settle PnL request accepted and is being processed. This may take a while.');
-      // Refresh unsettled PnL after settling
-      if (connectedChain && orderlyKey) {
-        setTimeout(async () => {
-          const pnl = await getUnsettledPnL(
-            connectedChain.id as SupportedChainIds,
-            accountId,
-            orderlyKey
-          );
-          setUnsettledPnL(pnl);
-        }, 2000);
-      }
-    } catch (error) {
-      showToast(`Failed to settle PnL: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-    }
-  };
-
-  const handleDeposit = async () => {
-    if (
-      !wallet ||
-      !amount ||
-      !usdcContract ||
-      allowance == null ||
-      !connectedChain ||
-      !brokerId ||
-      !balance
-    )
-      return;
-    try {
-      const amountBN = parseUnits(amount, usdcDecimals);
-      if (balance < amountBN) return;
-      if (allowance < amountBN) {
-        await usdcContract.approve(
-          getVaultAddress(connectedChain.id as SupportedChainIds),
-          amountBN
-        );
-        const allow = await usdcContract.allowance(
-          wallet.accounts[0].address,
-          getVaultAddress(connectedChain.id as SupportedChainIds)
-        );
-        setAllowance(allow);
-        showToast('Approval successful. You can now deposit.');
-      } else {
-        if (showEOA) {
-          await deposit(
-            wallet,
-            connectedChain.id as SupportedChainIds,
-            brokerId,
-            amountBN.toString(),
-            accountId
-          );
-        } else {
-          await delegateDeposit(
-            wallet,
-            connectedChain.id as SupportedChainIds,
-            brokerId,
-            contractAddress,
-            amountBN.toString(),
-            contractAddress,
-            accountId
-          );
-        }
-        showToast('Deposit request accepted and is being processed. This may take a while.');
-      }
-    } catch (error) {
-      showToast(`Deposit failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-    }
-  };
-
-  const handleWithdraw = async () => {
-    if (!wallet || !connectedChain || !orderlyKey || !amount || !vaultBalance) return;
-    try {
-      const amountBN = parseUnits(amount, 6);
-      if (parseUnits(String(vaultBalance), 6) < amountBN) return;
-      if (withdrawFee != null && parseFloat(amount) <= withdrawFee) return;
-      if (showEOA) {
-        await withdraw(
-          wallet,
-          connectedChain.id as SupportedChainIds,
-          brokerId,
-          accountId,
-          orderlyKey,
-          amountBN.toString(),
-          wallet.accounts[0].address
-        );
-      } else {
-        await delegateWithdraw(
-          wallet,
-          connectedChain.id as SupportedChainIds,
-          brokerId,
-          contractAddress,
-          accountId,
-          orderlyKey,
-          amountBN.toString(),
-          contractAddress
-        );
-      }
-      showToast('Withdraw request accepted and is being processed. This may take a while.');
-    } catch (error) {
-      showToast(`Withdraw failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
-    }
-  };
-
-  const maxDepositAmount =
-    balance != null ? Number(formatUnits(balance, usdcDecimals)) : undefined;
-  const maxWithdrawAmount = vaultBalance != null ? vaultBalance : undefined;
-
-  const hasUnsettledPnL = unsettledPnL != null && unsettledPnL !== 0;
-
   return (
-    <Flex style={{ margin: '1.5rem', maxWidth: '600px', width: '100%' }} direction="column" gap="4">
+    <Flex style={{ margin: '1.5rem' }} gap="4" align="center" justify="center" direction="column">
       <Heading>Assets</Heading>
 
       {!orderlyKey && (
-        <Callout.Root variant="outline">
+        <Callout.Root variant="outline" style={{ alignSelf: 'center' }}>
           <Callout.Text>
             You need to create an Orderly key in order to be able to display your Orderly balance.
           </Callout.Text>
         </Callout.Root>
       )}
 
-      {/* Network Selection */}
-      {connectedChain && (
-        <Flex direction="column" gap="2">
-          <Text size="2" weight="medium">
-            Network
-          </Text>
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger>
-              <Button variant="outline" style={{ width: '100%', justifyContent: 'space-between' }}>
-                <Flex align="center" gap="2">
-                  <img
-                    src={chainIcon}
-                    alt="connected chain"
-                    style={{ height: '1.5rem', width: '1.5rem' }}
-                  />
-                  {chainLabel}
-                </Flex>
-              </Button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-              <DropdownMenu.Label>Mainnet</DropdownMenu.Label>
-              {supportedChains
-                .filter(({ network }) => network === 'mainnet')
-                .map(({ id, icon, label }) => (
-                  <DropdownMenu.Item
-                    key={id}
-                    onSelect={selectChain(id)}
-                    style={{
-                      backgroundColor: connectedChain?.id === id ? 'lightgrey' : undefined,
-                      color: connectedChain?.id === id ? 'black' : undefined,
-                      fontWeight: connectedChain?.id === id ? '600' : undefined
-                    }}
-                  >
-                    <img
-                      src={icon}
-                      alt={label}
-                      style={{ marginRight: '0.3rem', height: '1.8rem', width: '1.8rem' }}
-                    />
-                    {label}
-                  </DropdownMenu.Item>
-                ))}
-              <DropdownMenu.Separator />
-              <DropdownMenu.Label>Testnet</DropdownMenu.Label>
-              {supportedChains
-                .filter(({ network }) => network === 'testnet')
-                .map(({ id, icon, label }) => (
-                  <DropdownMenu.Item
-                    key={id}
-                    onSelect={selectChain(id)}
-                    style={{
-                      backgroundColor: connectedChain?.id === id ? 'lightgrey' : undefined,
-                      color: connectedChain?.id === id ? 'black' : undefined,
-                      fontWeight: connectedChain?.id === id ? '600' : undefined
-                    }}
-                  >
-                    <img
-                      src={icon}
-                      alt={label}
-                      style={{
-                        marginRight: '0.3rem',
-                        height: '1.8rem',
-                        width: '1.8rem',
-                        backgroundColor: '#bbb',
-                        borderRadius: '50%'
-                      }}
-                    />
-                    {label}
-                  </DropdownMenu.Item>
-                ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
-        </Flex>
-      )}
+      <Table.Root>
+        <Table.Body>
+          <Table.Row>
+            <Table.RowHeaderCell>Connected Wallet Balance (USDC):</Table.RowHeaderCell>
+            <Table.Cell>
+              {balance != null ? usdFormatter.format(Number(formatUnits(balance, usdcDecimals))) : '-'}
+            </Table.Cell>
+          </Table.Row>
+          {!showEOA && (
+            <Table.Row>
+              <Table.RowHeaderCell>Delegate Signer Balance (USDC):</Table.RowHeaderCell>
+              <Table.Cell>
+                {contractBalance != null
+                  ? usdFormatter.format(Number(formatUnits(contractBalance, usdcDecimals)))
+                  : '-'}
+              </Table.Cell>
+            </Table.Row>
+          )}
+          <Table.Row>
+            <Table.RowHeaderCell>Orderly Account Balance (USDC):</Table.RowHeaderCell>
+            <Table.Cell>
+              {vaultBalance != null ? usdFormatter.format(vaultBalance) : '-'}
+            </Table.Cell>
+          </Table.Row>
+          <Table.Row>
+            <Table.RowHeaderCell>Unsettled PnL (USDC):</Table.RowHeaderCell>
+            <Table.Cell>
+              {unsettledPnL != null ? usdFormatter.format(unsettledPnL) : '-'}
+            </Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      </Table.Root>
 
-      {/* Tabs */}
-      <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'deposit' | 'withdraw')}>
-        <Tabs.List>
-          <Tabs.Trigger value="deposit">Deposit</Tabs.Trigger>
-          <Tabs.Trigger value="withdraw">Withdraw</Tabs.Trigger>
-        </Tabs.List>
+      <Flex direction="column" gap="4">
+        <TextField.Root
+          style={{ gridArea: 'input' }}
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="USDC amount"
+          onChange={(event) => {
+            setAmount(event.target.value);
+          }}
+        />
 
-        {/* Deposit Tab */}
-        <Tabs.Content value="deposit">
-          <Flex direction="column" gap="4" style={{ paddingTop: '1rem' }}>
-            <Flex direction="column" gap="2">
-              <Flex justify="between" align="center">
-                <Text size="2" weight="medium">
-                  Amount
-                </Text>
-                {maxDepositAmount != null && (
-                  <Button
-                    variant="ghost"
-                    size="1"
-                    onClick={() => setAmount(maxDepositAmount.toFixed(6))}
-                  >
-                    MAX
-                  </Button>
-                )}
-              </Flex>
-              <TextField.Root
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={amount}
-                onChange={(event) => {
-                  setAmount(event.target.value);
-                }}
-              />
-              {balance != null && (
-                <Text size="1" color="gray">
-                  Balance: {usdFormatter.format(Number(formatUnits(balance, usdcDecimals)))}{' '}
-                  USDC
-                </Text>
-              )}
-            </Flex>
-
-            <Button
-              disabled={
+        {showEOA ? (
+          <Button
+            disabled={
+              !wallet ||
+              !amount ||
+              !usdcContract ||
+              allowance == null ||
+              !connectedChain ||
+              !brokerId ||
+              !balance ||
+              balance < parseUnits(amount, usdcDecimals)
+            }
+            onClick={async () => {
+              if (
                 !wallet ||
                 !amount ||
                 !usdcContract ||
                 allowance == null ||
                 !connectedChain ||
                 !brokerId ||
-                !balance ||
-                balance < parseUnits(amount || '0', usdcDecimals)
+                !balance
+              )
+                return;
+              const amountBN = parseUnits(amount, usdcDecimals);
+              if (balance < amountBN) return;
+              if (allowance < amountBN) {
+                await usdcContract.approve(
+                  getVaultAddress(connectedChain.id as SupportedChainIds),
+                  amountBN
+                );
+                const allow = await usdcContract.allowance(
+                  wallet.accounts[0].address,
+                  getVaultAddress(connectedChain.id as SupportedChainIds)
+                );
+                setAllowance(allow);
+              } else {
+                await deposit(
+                  wallet,
+                  connectedChain.id as SupportedChainIds,
+                  brokerId,
+                  amountBN.toString(),
+                  accountId
+                );
               }
-              onClick={handleDeposit}
-              size="3"
-            >
-              {needsApproval ? 'Approve' : showEOA ? 'Deposit' : 'Deposit to Contract'}
-            </Button>
-          </Flex>
-        </Tabs.Content>
-
-        {/* Withdraw Tab */}
-        <Tabs.Content value="withdraw">
-          <Flex direction="column" gap="4" style={{ paddingTop: '1rem' }}>
-            <Flex direction="column" gap="2">
-              <Flex justify="between" align="center">
-                <Text size="2" weight="medium">
-                  Amount
-                </Text>
-                {maxWithdrawAmount != null && (
-                  <Button
-                    variant="ghost"
-                    size="1"
-                    onClick={() => setAmount(maxWithdrawAmount.toFixed(6))}
-                  >
-                    MAX
-                  </Button>
-                )}
-              </Flex>
-              <TextField.Root
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={amount}
-                onChange={(event) => {
-                  setAmount(event.target.value);
-                }}
-              />
-              {vaultBalance != null && (
-                <Text size="1" color="gray">
-                  Available: {usdFormatter.format(vaultBalance)} USDC
-                </Text>
-              )}
-            </Flex>
-
-            {/* Received Quantity (Amount - Fee) */}
-            {amount && withdrawFee != null && netWithdrawAmount != null && (
-              <Flex direction="column" gap="1">
-                <Flex justify="between">
-                  <Text size="2" weight="medium">
-                    Received Quantity
-                  </Text>
-                  <Text size="2">{usdFormatter.format(netWithdrawAmount)} USDC</Text>
-                </Flex>
-              </Flex>
-            )}
-
-            {/* Withdraw Fee */}
-            {withdrawFee != null && (
-              <Flex direction="column" gap="1">
-                <Flex justify="between">
-                  <Text size="2" weight="medium">
-                    Withdraw Fee
-                  </Text>
-                  <Text size="2">{usdFormatter.format(withdrawFee)} USDC</Text>
-                </Flex>
-              </Flex>
-            )}
-
-            {/* Unsettled PnL (only show if non-zero) */}
-            {hasUnsettledPnL && (
-              <Callout.Root color="yellow" variant="soft">
-                <Callout.Text>
-                  Unsettled PnL: {usdFormatter.format(unsettledPnL)} USDC. Please settle before
-                  withdrawing.
-                </Callout.Text>
-              </Callout.Root>
-            )}
-
-            {/* Warning if amount <= fee */}
-            {amount &&
-              withdrawFee != null &&
-              parseFloat(amount) <= withdrawFee &&
-              !hasUnsettledPnL && (
-                <Callout.Root color="red" variant="soft">
-                  <Callout.Text>
-                    Withdraw amount must be greater than the withdraw fee (
-                    {usdFormatter.format(withdrawFee)} USDC).
-                  </Callout.Text>
-                </Callout.Root>
-              )}
-
-            <Button
-              disabled={
-                hasUnsettledPnL
-                  ? !wallet || !connectedChain || !brokerId || !orderlyKey
-                  : !wallet ||
-                    !connectedChain ||
-                    !brokerId ||
-                    !orderlyKey ||
-                    !amount ||
-                    !vaultBalance ||
-                    parseUnits(String(vaultBalance), 6) < parseUnits(amount || '0', 6) ||
-                    (withdrawFee != null && parseFloat(amount) <= withdrawFee)
+            }}
+          >
+            {needsApproval ? 'Approve' : 'Deposit'}
+          </Button>
+        ) : (
+          <Button
+            disabled={
+              !wallet ||
+              !amount ||
+              !usdcContract ||
+              allowance == null ||
+              !connectedChain ||
+              !brokerId ||
+              !balance ||
+              balance < parseUnits(amount, usdcDecimals)
+            }
+            onClick={async () => {
+              if (
+                !wallet ||
+                !amount ||
+                !usdcContract ||
+                allowance == null ||
+                !connectedChain ||
+                !brokerId ||
+                !balance
+              )
+                return;
+              const amountBN = parseUnits(amount, usdcDecimals);
+              if (balance < amountBN) return;
+              if (allowance < amountBN) {
+                await usdcContract.approve(
+                  getVaultAddress(connectedChain.id as SupportedChainIds),
+                  amountBN
+                );
+                const allow = await usdcContract.allowance(
+                  wallet.accounts[0].address,
+                  getVaultAddress(connectedChain.id as SupportedChainIds)
+                );
+                setAllowance(allow);
+              } else {
+                await delegateDeposit(
+                  wallet,
+                  connectedChain.id as SupportedChainIds,
+                  brokerId,
+                  contractAddress,
+                  amountBN.toString(),
+                  contractAddress,
+                  accountId
+                );
               }
-              onClick={hasUnsettledPnL ? handleSettlePnL : handleWithdraw}
-              size="3"
-            >
-              {hasUnsettledPnL
-                ? showEOA
-                  ? 'Settle PnL'
-                  : 'Settle Delegate PnL'
-                : showEOA
-                  ? 'Withdraw'
-                  : 'Withdraw from Contract'}
-            </Button>
-          </Flex>
-        </Tabs.Content>
-      </Tabs.Root>
+            }}
+          >
+            {needsApproval ? 'Approve' : 'Deposit to Contract'}
+          </Button>
+        )}
+
+        {showEOA ? (
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !orderlyKey || !amount) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              await withdraw(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                accountId,
+                orderlyKey,
+                amountBN.toString(),
+                wallet.accounts[0].address
+              );
+            }}
+          >
+            Withdraw
+          </Button>
+        ) : (
+          <Button
+            disabled={
+              !wallet ||
+              !connectedChain ||
+              !orderlyKey ||
+              !amount ||
+              !brokerId ||
+              parseUnits(String(vaultBalance), 6) < parseUnits(amount, 6) ||
+              parseUnits(amount, 6) < 2_500_000n // fee
+            }
+            onClick={async () => {
+              if (!wallet || !connectedChain || !orderlyKey || !amount) return;
+              const amountBN = parseUnits(amount, 6);
+              if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+              await delegateWithdraw(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                contractAddress,
+                accountId,
+                orderlyKey,
+                amountBN.toString(),
+                contractAddress
+              );
+            }}
+          >
+            Withdraw from Contract
+          </Button>
+        )}
+
+        {showEOA ? (
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
+              await settlePnL(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                accountId,
+                orderlyKey
+              );
+            }}
+          >
+            Settle PnL
+          </Button>
+        ) : (
+          <Button
+            disabled={!wallet || !connectedChain || !brokerId || !orderlyKey}
+            onClick={async () => {
+              if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
+              await delegateSettlePnL(
+                wallet,
+                connectedChain.id as SupportedChainIds,
+                brokerId,
+                contractAddress,
+                accountId,
+                orderlyKey
+              );
+            }}
+          >
+            Settle Delegate PnL
+          </Button>
+        )}
+      </Flex>
     </Flex>
   );
 };

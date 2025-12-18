@@ -625,43 +625,6 @@ export async function getUnsettledPnL(
   return positions.reduce((acc, position) => acc + position.unsettled_pnl, 0);
 }
 
-export async function getWithdrawFee(chainId: SupportedChainIds): Promise<number | undefined> {
-  try {
-    const res = await fetch(`${getBaseUrl(chainId)}/v1/public/token`);
-    if (!res.ok) {
-      return undefined;
-    }
-    const json = await res.json();
-    if (!json.success) {
-      return undefined;
-    }
-    const tokens = json.data.rows as Array<{
-      token: string;
-      chain_details: Array<{
-        chain_id: string | number;
-        withdrawal_fee: number;
-        decimals: number;
-      }>;
-    }>;
-    const usdcToken = tokens.find((token) => token.token === 'USDC');
-    console.log('usdcToken', usdcToken);
-    if (!usdcToken) {
-      return undefined;
-    }
-    const chainIdNumber = Number(chainId);
-    const chainDetail = usdcToken.chain_details.find(
-      (detail) => Number(detail.chain_id) === chainIdNumber
-    );
-    console.log('chainDetail', chainDetail);
-    if (!chainDetail) {
-      return undefined;
-    }
-    return chainDetail.withdrawal_fee;
-  } catch {
-    return undefined;
-  }
-}
-
 async function signAndSendRequest(
   accountId: string,
   orderlyKey: Uint8Array | string,
