@@ -9,7 +9,7 @@ export const supportedChains = [
     id: '0x1',
     token: 'ETH',
     label: 'Ethereum',
-    rpcUrl: 'https://arbitrum-one.publicnode.com'
+    rpcUrl: 'https://ethereum-rpc.publicnode.com'
   },
   {
     network: 'mainnet',
@@ -17,7 +17,7 @@ export const supportedChains = [
     id: '0xa4b1',
     token: 'ETH',
     label: 'Arbitrum One',
-    rpcUrl: 'https://ethereum-rpc.publicnode.com'
+    rpcUrl: 'https://arbitrum-one.publicnode.com'
   },
   {
     network: 'mainnet',

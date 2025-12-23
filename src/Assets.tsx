@@ -414,6 +414,9 @@ export const Assets: FC<{
                 onChange={(event) => {
                   setAmount(event.target.value);
                 }}
+                onWheel={(event) => {
+                  event.currentTarget.blur();
+                }}
               />
               {balance != null && (
                 <Text size="1" color="gray">
@@ -468,6 +471,9 @@ export const Assets: FC<{
                 value={amount}
                 onChange={(event) => {
                   setAmount(event.target.value);
+                }}
+                onWheel={(event) => {
+                  event.currentTarget.blur();
                 }}
               />
               {vaultBalance != null && (
