@@ -159,7 +159,6 @@ export const Assets: FC<{
         return;
       }
       const fee = await getWithdrawFee(connectedChain.id as SupportedChainIds);
-      console.log('fee', fee)
       setWithdrawFee(fee);
     };
     fetchWithdrawFee();

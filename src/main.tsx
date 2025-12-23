@@ -16,8 +16,7 @@ import '@radix-ui/themes/styles.css';
 const injected = injectedModule();
 const walletConnect = walletConnectModule({
   projectId: '2179ab00c0afb9d78c9c0a3097278d1b',
-  requiredChains: [10, 42161],
-  optionalChains: [421614, 11155420],
+  optionalChains: supportedChains.map(({ id }) => Number(id)),
   dappUrl: 'https://orderlynetwork.github.io/broker-registration'
 });
 const safe = safeModule();

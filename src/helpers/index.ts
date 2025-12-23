@@ -644,7 +644,6 @@ export async function getWithdrawFee(chainId: SupportedChainIds): Promise<number
       }>;
     }>;
     const usdcToken = tokens.find((token) => token.token === 'USDC');
-    console.log('usdcToken', usdcToken);
     if (!usdcToken) {
       return undefined;
     }
@@ -652,7 +651,6 @@ export async function getWithdrawFee(chainId: SupportedChainIds): Promise<number
     const chainDetail = usdcToken.chain_details.find(
       (detail) => Number(detail.chain_id) === chainIdNumber
     );
-    console.log('chainDetail', chainDetail);
     if (!chainDetail) {
       return undefined;
     }
