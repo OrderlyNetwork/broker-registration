@@ -1,9 +1,10 @@
 import { Button, Callout, DropdownMenu, Flex, Heading, Tabs, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
-import { BrowserProvider, formatUnits, parseUnits } from 'ethers';
+import { BrowserProvider, formatUnits, parseUnits, solidityPackedKeccak256 } from 'ethers';
 import { FC, useEffect, useState } from 'react';
 
-import { NativeUSDC, NativeUSDC__factory } from './abi';
+import { NativeUSDC, NativeUSDC__factory, Vault__factory } from './abi';
+import { VaultTypes } from './abi/Vault';
 import {
   getUSDCAddress,
   getVaultAddress,
@@ -216,17 +217,97 @@ export const Assets: FC<{
     try {
       const amountBN = parseUnits(amount, usdcDecimals);
       if (balance < amountBN) return;
+      
+      const isWalletConnect = wallet.label?.toLowerCase().includes('walletconnect') ?? false;
+      console.log('isWalletConnect', isWalletConnect);
+      
       if (allowance < amountBN) {
-        await usdcContract.approve(
-          getVaultAddress(connectedChain.id as SupportedChainIds),
-          amountBN
-        );
-        const allow = await usdcContract.allowance(
-          wallet.accounts[0].address,
-          getVaultAddress(connectedChain.id as SupportedChainIds)
-        );
-        setAllowance(allow);
-        showToast('Approval successful. You can now deposit.');
+        if (isWalletConnect) {
+          try {
+            const provider = new BrowserProvider(wallet.provider);
+            const signer = await provider.getSigner();
+            
+            const approveTxData = await usdcContract.approve.populateTransaction(
+              getVaultAddress(connectedChain.id as SupportedChainIds),
+              amountBN
+            );
+            
+            const vaultContract = Vault__factory.connect(getVaultAddress(connectedChain.id as SupportedChainIds), signer);
+            
+            const depositInput = {
+              brokerHash: solidityPackedKeccak256(['string'], [brokerId]),
+              tokenAmount: amountBN.toString(),
+              tokenHash: solidityPackedKeccak256(['string'], ['USDC']),
+              accountId
+            } satisfies VaultTypes.VaultDepositFEStruct;
+            
+            const depositFee = await vaultContract.getDepositFee(
+              showEOA ? wallet.accounts[0].address : contractAddress,
+              depositInput
+            );
+            
+            const depositTxData = showEOA
+              ? await vaultContract.deposit.populateTransaction(depositInput, { value: depositFee })
+              : await vaultContract.depositTo.populateTransaction(contractAddress, depositInput, { value: depositFee });
+
+            const toRpcTx = (tx: typeof approveTxData) => {
+              const rpcTx: Record<string, string> = {
+                from: wallet.accounts[0].address,
+                to: tx.to || '',
+                data: tx.data || '0x',
+                value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
+              };
+              
+              if (tx.gasLimit) {
+                rpcTx.gas = `0x${tx.gasLimit.toString(16)}`;
+              }
+              if (tx.gasPrice) {
+                rpcTx.gasPrice = `0x${tx.gasPrice.toString(16)}`;
+              }
+              if (tx.maxFeePerGas) {
+                rpcTx.maxFeePerGas = `0x${tx.maxFeePerGas.toString(16)}`;
+              }
+              if (tx.maxPriorityFeePerGas) {
+                rpcTx.maxPriorityFeePerGas = `0x${tx.maxPriorityFeePerGas.toString(16)}`;
+              }
+              
+              return rpcTx;
+            };
+
+            const approveTxRpc = toRpcTx(approveTxData);
+            const depositTxRpc = toRpcTx(depositTxData);
+
+            provider.send('eth_sendTransaction', [approveTxRpc]).catch(() => {});
+            provider.send('eth_sendTransaction', [depositTxRpc]).catch(() => {});
+            
+            showToast('Approve and deposit transactions submitted. Please confirm in your multisig wallet.');
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorString = String(error).toLowerCase();
+            if (
+              errorMessage.toLowerCase().includes('allowance') ||
+              errorMessage.toLowerCase().includes('transfer amount exceeds') ||
+              errorString.includes('erc20') ||
+              errorString.includes('exceeds allowance')
+            ) {
+              showToast('Approve and deposit transactions submitted. Please confirm in your multisig wallet.');
+            } else {
+              throw error;
+            }
+          }
+        } else {
+          const approveTx = await usdcContract.approve(
+            getVaultAddress(connectedChain.id as SupportedChainIds),
+            amountBN
+          );
+          await approveTx.wait();
+          const allow = await usdcContract.allowance(
+            wallet.accounts[0].address,
+            getVaultAddress(connectedChain.id as SupportedChainIds)
+          );
+          setAllowance(allow);
+          showToast('Approval successful. You can now deposit.');
+        }
       } else {
         if (showEOA) {
           await deposit(
