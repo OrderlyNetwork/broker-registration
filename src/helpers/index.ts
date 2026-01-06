@@ -7,7 +7,8 @@ import {
   solidityPackedKeccak256,
   BrowserProvider,
   keccak256,
-  AbiCoder
+  AbiCoder,
+  zeroPadValue
 } from 'ethers';
 
 import { Vault__factory } from '../abi';
@@ -122,6 +123,21 @@ const MESSAGE_TYPES = {
     { name: 'chainId', type: 'uint256' },
     { name: 'settleNonce', type: 'uint64' },
     { name: 'timestamp', type: 'uint64' }
+  ],
+  InternalTransfer: [
+    { name: 'receiver', type: 'bytes32' },
+    { name: 'token', type: 'string' },
+    { name: 'amount', type: 'uint256' },
+    { name: 'transferNonce', type: 'uint64' }
+  ],
+  DelegateInternalTransfer: [
+    { name: 'delegateContract', type: 'address' },
+    { name: 'receiver', type: 'string' },
+    { name: 'token', type: 'string' },
+    { name: 'amount', type: 'uint256' },
+    { name: 'transferNonce', type: 'uint64' },
+    { name: 'chainId', type: 'uint256' },
+    { name: 'chainType', type: 'string' }
   ]
 };
 
@@ -580,6 +596,131 @@ export async function settlePnL(
   const registerJson = await res.json();
   if (!registerJson.success) {
     throw new Error(registerJson.message);
+  }
+}
+
+export async function transfer(
+  wallet: WalletState,
+  chainId: SupportedChainIds,
+  accountId: string,
+  orderlyKey: Uint8Array,
+  receiver: string,
+  amount: string
+): Promise<void> {
+  const nonceRes = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/transfer_nonce`
+  );
+  const nonceJson = await nonceRes.json();
+  const transferNonce = nonceJson.data.transfer_nonce as string;
+
+  const receiverHex = receiver.startsWith('0x') ? receiver.slice(2) : receiver;
+  const receiverBytes32 = zeroPadValue('0x' + receiverHex, 32);
+
+  const transferMessageForSigning = {
+    receiver: receiverBytes32,
+    token: 'USDC',
+    amount: Number(amount),
+    transferNonce: Number(transferNonce)
+  };
+
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOnChainDomain(chainId),
+    { InternalTransfer: MESSAGE_TYPES.InternalTransfer },
+    transferMessageForSigning
+  );
+
+  const transferMessageForApi = {
+    receiver,
+    token: 'USDC',
+    amount: String(amount),
+    transferNonce: String(transferNonce),
+    chainId: String(Number(chainId)),
+    chainType: 'EVM'
+  };
+
+  const res = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v2/internal_transfer`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        message: transferMessageForApi,
+        signature,
+        userAddress: wallet.accounts[0].address,
+        verifyingContract: getVerifyingAddress(chainId)
+      })
+    }
+  );
+  const transferJson = await res.json();
+  if (!transferJson.success) {
+    throw new Error(transferJson.message);
+  }
+}
+
+export async function delegateTransfer(
+  wallet: WalletState,
+  chainId: SupportedChainIds,
+  delegateContract: string,
+  accountId: string,
+  orderlyKey: Uint8Array,
+  receiver: string,
+  amount: string
+): Promise<void> {
+  const nonceRes = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v1/transfer_nonce`
+  );
+  const nonceJson = await nonceRes.json();
+  const transferNonce = nonceJson.data.transfer_nonce as string;
+
+  const delegateTransferMessageForApi = {
+    receiver,
+    token: 'USDC',
+    amount: String(amount),
+    transferNonce: String(transferNonce),
+    chainId: String(Number(chainId)),
+    chainType: 'EVM'
+  };
+
+  const provider = new BrowserProvider(wallet.provider);
+  const signer = await provider.getSigner();
+  const signature = await signer.signTypedData(
+    getOffChainDomain(chainId),
+    { DelegateInternalTransfer: MESSAGE_TYPES.DelegateInternalTransfer },
+    {
+      delegateContract,
+      receiver,
+      token: 'USDC',
+      amount: Number(amount),
+      transferNonce: Number(transferNonce),
+      chainId: Number(chainId),
+      chainType: 'EVM'
+    }
+  );
+
+  const delegateTransferRes = await signAndSendRequest(
+    accountId,
+    orderlyKey,
+    `${getBaseUrl(chainId)}/v2/internal_transfer`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        message: delegateTransferMessageForApi,
+        signature,
+        userAddress: wallet.accounts[0].address,
+        verifyingContract: getVerifyingAddress(chainId)
+      })
+    }
+  );
+  const transferJson = await delegateTransferRes.json();
+  if (!transferJson.success) {
+    throw new Error(transferJson.message);
   }
 }
 

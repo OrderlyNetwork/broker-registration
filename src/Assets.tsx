@@ -20,7 +20,9 @@ import {
   deposit,
   getUSDCDecimals,
   getWithdrawFee,
-  supportedChains
+  supportedChains,
+  transfer,
+  delegateTransfer
 } from './helpers';
 import { useToast } from './Toast';
 
@@ -31,8 +33,9 @@ export const Assets: FC<{
   showEOA: boolean;
   orderlyKey?: Uint8Array;
 }> = ({ brokerId, accountId, contractAddress, showEOA, orderlyKey }) => {
-  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw'>('deposit');
+  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw' | 'transfer'>('deposit');
   const [amount, setAmount] = useState<string>('');
+  const [receiverAccountId, setReceiverAccountId] = useState<string>('');
   const [balance, setBalance] = useState<bigint>();
   const [allowance, setAllowance] = useState<bigint>();
   const [vaultBalance, setVaultBalance] = useState<number>();
@@ -369,6 +372,37 @@ export const Assets: FC<{
     }
   };
 
+  const handleTransfer = async () => {
+    if (!wallet || !connectedChain || !orderlyKey || !amount || !receiverAccountId || !vaultBalance) return;
+    try {
+      const amountBN = parseUnits(amount, 6);
+      if (parseUnits(String(vaultBalance), 6) < amountBN) return;
+      if (showEOA) {
+        await transfer(
+          wallet,
+          connectedChain.id as SupportedChainIds,
+          accountId,
+          orderlyKey,
+          receiverAccountId,
+          amountBN.toString()
+        );
+      } else {
+        await delegateTransfer(
+          wallet,
+          connectedChain.id as SupportedChainIds,
+          contractAddress,
+          accountId,
+          orderlyKey,
+          receiverAccountId,
+          amountBN.toString()
+        );
+      }
+      showToast('Transfer request accepted and is being processed. This may take a while.');
+    } catch (error) {
+      showToast(`Transfer failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+    }
+  };
+
   const maxDepositAmount =
     balance != null ? Number(formatUnits(balance, usdcDecimals)) : undefined;
   const maxWithdrawAmount = vaultBalance != null ? vaultBalance : undefined;
@@ -462,10 +496,11 @@ export const Assets: FC<{
       )}
 
       {/* Tabs */}
-      <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'deposit' | 'withdraw')}>
+      <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as 'deposit' | 'withdraw' | 'transfer')}>
         <Tabs.List>
           <Tabs.Trigger value="deposit">Deposit</Tabs.Trigger>
           <Tabs.Trigger value="withdraw">Withdraw</Tabs.Trigger>
+          <Tabs.Trigger value="transfer">Transfer</Tabs.Trigger>
         </Tabs.List>
 
         {/* Deposit Tab */}
@@ -634,6 +669,77 @@ export const Assets: FC<{
                 : showEOA
                   ? 'Withdraw'
                   : 'Withdraw from Contract'}
+            </Button>
+          </Flex>
+        </Tabs.Content>
+
+        {/* Transfer Tab */}
+        <Tabs.Content value="transfer">
+          <Flex direction="column" gap="4" style={{ paddingTop: '1rem' }}>
+            <Flex direction="column" gap="2">
+              <Text size="2" weight="medium">
+                Receiver Account ID
+              </Text>
+              <TextField.Root
+                type="text"
+                placeholder="Enter Orderly account ID"
+                value={receiverAccountId}
+                onChange={(event) => {
+                  setReceiverAccountId(event.target.value);
+                }}
+              />
+            </Flex>
+
+            <Flex direction="column" gap="2">
+              <Flex justify="between" align="center">
+                <Text size="2" weight="medium">
+                  Amount
+                </Text>
+                {maxWithdrawAmount != null && (
+                  <Button
+                    variant="ghost"
+                    size="1"
+                    onClick={() => setAmount(maxWithdrawAmount.toFixed(6))}
+                  >
+                    MAX
+                  </Button>
+                )}
+              </Flex>
+              <TextField.Root
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={amount}
+                onChange={(event) => {
+                  setAmount(event.target.value);
+                }}
+                onWheel={(event) => {
+                  event.currentTarget.blur();
+                }}
+              />
+              {vaultBalance != null && (
+                <Text size="1" color="gray">
+                  Available: {usdFormatter.format(vaultBalance)} USDC
+                </Text>
+              )}
+            </Flex>
+
+            <Button
+              disabled={
+                !wallet ||
+                !connectedChain ||
+                !brokerId ||
+                !orderlyKey ||
+                !amount ||
+                !receiverAccountId ||
+                !vaultBalance ||
+                parseUnits(String(vaultBalance), 6) < parseUnits(amount || '0', 6)
+              }
+              onClick={handleTransfer}
+              size="3"
+            >
+              {showEOA ? 'Transfer' : 'Transfer from Contract'}
             </Button>
           </Flex>
         </Tabs.Content>
