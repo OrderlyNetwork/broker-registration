@@ -11,7 +11,7 @@ import {
   zeroPadValue
 } from 'ethers';
 
-import { Vault__factory } from '../abi';
+import { Vault__factory, NativeUSDC__factory } from '../abi';
 import { VaultTypes } from '../abi/Vault';
 
 import {
@@ -20,6 +20,7 @@ import {
   getOnChainDomain,
   getVaultAddress,
   getVerifyingAddress,
+  getUSDCAddress,
   isTestnet
 } from './constants';
 import { SupportedChainIds } from './network';
@@ -385,6 +386,17 @@ export async function deposit(
   await contract.deposit(depositInput, { value: depositFee });
 }
 
+async function getVaultUSDCBalance(
+  wallet: WalletState,
+  chainId: SupportedChainIds
+): Promise<bigint> {
+  const provider = new BrowserProvider(wallet.provider);
+  const usdcContract = NativeUSDC__factory.connect(getUSDCAddress(chainId), provider);
+  const vaultAddress = getVaultAddress(chainId);
+  const balance = await usdcContract.balanceOf(vaultAddress);
+  return balance;
+}
+
 export async function withdraw(
   wallet: WalletState,
   chainId: SupportedChainIds,
@@ -402,7 +414,17 @@ export async function withdraw(
   const nonceJson = await nonceRes.json();
   const withdrawNonce = nonceJson.data.withdraw_nonce as string;
 
-  const withdrawMessage = {
+  let vaultBalance: bigint;
+  try {
+    vaultBalance = await getVaultUSDCBalance(wallet, chainId);
+  } catch (error) {
+    console.warn('Failed to fetch Vault USDC balance, falling back to zero:', error);
+    vaultBalance = 0n;
+  }
+  const amountBN = BigInt(amount);
+  const allowCrossChainWithdraw = vaultBalance < amountBN;
+
+  const withdrawMessageForSigning = {
     brokerId,
     chainId: Number(chainId),
     receiver,
@@ -417,8 +439,13 @@ export async function withdraw(
   const signature = await signer.signTypedData(
     getOnChainDomain(chainId),
     { Withdraw: MESSAGE_TYPES.Withdraw },
-    withdrawMessage
+    withdrawMessageForSigning
   );
+
+  const withdrawMessageForApi = {
+    ...withdrawMessageForSigning,
+    allowCrossChainWithdraw
+  };
 
   const res = await signAndSendRequest(
     accountId,
@@ -427,7 +454,7 @@ export async function withdraw(
     {
       method: 'POST',
       body: JSON.stringify({
-        message: withdrawMessage,
+        message: withdrawMessageForApi,
         signature,
         userAddress: wallet.accounts[0].address,
         verifyingContract: getVerifyingAddress(chainId)
@@ -458,7 +485,17 @@ export async function delegateWithdraw(
   const nonceJson = await nonceRes.json();
   const withdrawNonce = nonceJson.data.withdraw_nonce as string;
 
-  const delegateWithdrawMessage = {
+  let vaultBalance: bigint;
+  try {
+    vaultBalance = await getVaultUSDCBalance(wallet, chainId);
+  } catch (error) {
+    console.warn('Failed to fetch Vault USDC balance, falling back to zero:', error);
+    vaultBalance = 0n;
+  }
+  const amountBN = BigInt(amount);
+  const allowCrossChainWithdraw = vaultBalance < amountBN;
+
+  const delegateWithdrawMessageForSigning = {
     delegateContract,
     brokerId,
     chainId: Number(chainId),
@@ -474,8 +511,13 @@ export async function delegateWithdraw(
   const signature = await signer.signTypedData(
     getOnChainDomain(chainId),
     { DelegateWithdraw: MESSAGE_TYPES.DelegateWithdraw },
-    delegateWithdrawMessage
+    delegateWithdrawMessageForSigning
   );
+
+  const delegateWithdrawMessageForApi = {
+    ...delegateWithdrawMessageForSigning,
+    allowCrossChainWithdraw
+  };
 
   const delegateWithdrawRes = await signAndSendRequest(
     accountId,
@@ -484,7 +526,7 @@ export async function delegateWithdraw(
     {
       method: 'POST',
       body: JSON.stringify({
-        message: delegateWithdrawMessage,
+        message: delegateWithdrawMessageForApi,
         signature,
         userAddress: wallet.accounts[0].address,
         verifyingContract: getVerifyingAddress(chainId)
