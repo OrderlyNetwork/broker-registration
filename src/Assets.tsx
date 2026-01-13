@@ -466,6 +466,7 @@ export const Assets: FC<{
     amount &&
     vaultBalance != null &&
     unsettledPnL != null &&
+    unsettledPnL !== 0 &&
     parseFloat(amount) > vaultBalance + unsettledPnL;
 
   const formatDate = (timestamp: number) => {
