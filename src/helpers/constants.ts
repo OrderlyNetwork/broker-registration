@@ -89,8 +89,8 @@ export function getUSDCAddress(chainId: SupportedChainIds): string {
 
 export function getBaseUrl(chainId: SupportedChainIds): string {
   return match(isTestnet(chainId))
-    .with(false, () => 'https://api-evm.orderly.org')
-    .with(true, () => 'https://testnet-api-evm.orderly.org')
+    .with(false, () => 'https://api.orderly.org')
+    .with(true, () => 'https://testnet-api.orderly.org')
     .exhaustive();
 }
 

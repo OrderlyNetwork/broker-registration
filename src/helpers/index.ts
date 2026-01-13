@@ -801,6 +801,60 @@ export async function getWithdrawFee(chainId: SupportedChainIds): Promise<number
   }
 }
 
+export type AssetHistoryItem = {
+  id: string;
+  tx_id: string;
+  side: 'DEPOSIT' | 'WITHDRAW';
+  token: string;
+  amount: number;
+  fee: number;
+  trans_status: 'NEW' | 'CONFIRM' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'PENDING_REBALANCE';
+  created_time: number;
+  updated_time: number;
+  chain_id: string;
+};
+
+export type AssetHistoryResponse = {
+  success: boolean;
+  data: {
+    meta: {
+      total: number;
+      records_per_page: number;
+      current_page: number;
+    };
+    rows: AssetHistoryItem[];
+  };
+  timestamp: number;
+};
+
+export async function getAssetHistory(
+  chainId: SupportedChainIds,
+  accountId: string,
+  orderlyKey: Uint8Array,
+  side?: 'DEPOSIT' | 'WITHDRAW',
+  status?: 'NEW' | 'CONFIRM' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'PENDING_REBALANCE'
+): Promise<AssetHistoryResponse> {
+  const url = new URL(`${getBaseUrl(chainId)}/v1/asset/history`);
+  url.searchParams.set('page', '1');
+  url.searchParams.set('size', '20');
+  if (side) {
+    url.searchParams.set('side', side);
+  }
+  if (status) {
+    url.searchParams.set('status', status);
+  }
+
+  const res = await signAndSendRequest(accountId, orderlyKey, url);
+  if (!res.ok) {
+    throw new Error(`Could not fetch asset history`);
+  }
+  const json = await res.json();
+  if (!json.success) {
+    throw new Error(json.message);
+  }
+  return json as AssetHistoryResponse;
+}
+
 async function signAndSendRequest(
   accountId: string,
   orderlyKey: Uint8Array | string,
@@ -811,7 +865,8 @@ async function signAndSendRequest(
   const encoder = new TextEncoder();
 
   const url = new URL(input);
-  let message = `${String(timestamp)}${init?.method ?? 'GET'}${url.pathname}`;
+  const pathWithQuery = url.search ? `${url.pathname}${url.search}` : url.pathname;
+  let message = `${String(timestamp)}${init?.method ?? 'GET'}${pathWithQuery}`;
   if (init?.body) {
     message += init.body;
   }

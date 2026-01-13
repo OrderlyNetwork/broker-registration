@@ -1,7 +1,7 @@
 import { Button, Callout, DropdownMenu, Flex, Heading, Tabs, Text, TextField } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
 import { BrowserProvider, formatUnits, parseUnits, solidityPackedKeccak256 } from 'ethers';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 
 import { NativeUSDC, NativeUSDC__factory, Vault__factory } from './abi';
 import { VaultTypes } from './abi/Vault';
@@ -22,7 +22,10 @@ import {
   getWithdrawFee,
   supportedChains,
   transfer,
-  delegateTransfer
+  delegateTransfer,
+  getAssetHistory,
+  type AssetHistoryItem,
+  isTestnet
 } from './helpers';
 import { useToast } from './Toast';
 
@@ -42,6 +45,9 @@ export const Assets: FC<{
   const [usdcContract, setUsdcContract] = useState<NativeUSDC>();
   const [unsettledPnL, setUnsettledPnL] = useState<number>();
   const [withdrawFee, setWithdrawFee] = useState<number>();
+  const [history, setHistory] = useState<AssetHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState<boolean>(false);
+  const hasLoadedHistoryRef = useRef<boolean>(false);
 
   const [{ wallet }] = useConnectWallet();
   const [{ connectedChain }, setChain] = useSetChain();
@@ -168,6 +174,55 @@ export const Assets: FC<{
     fetchWithdrawFee();
   }, [connectedChain]);
 
+  useEffect(() => {
+    if (!connectedChain || !orderlyKey || (activeTab !== 'deposit' && activeTab !== 'withdraw')) {
+      setHistory([]);
+      setHistoryLoading(false);
+      hasLoadedHistoryRef.current = false;
+      return;
+    }
+    let isMounted = true;
+    const fetchHistory = async () => {
+      if (!connectedChain || !orderlyKey || !isMounted) {
+        return;
+      }
+      if (!hasLoadedHistoryRef.current) {
+        setHistoryLoading(true);
+      }
+      try {
+        const side = activeTab === 'deposit' ? 'DEPOSIT' : 'WITHDRAW';
+        const response = await getAssetHistory(
+          connectedChain.id as SupportedChainIds,
+          accountId,
+          orderlyKey,
+          side
+        );
+        if (isMounted) {
+          setHistory(response.data.rows);
+          hasLoadedHistoryRef.current = true;
+        }
+      } catch (error) {
+        console.error('Failed to fetch history:', error);
+        if (isMounted) {
+          if (!hasLoadedHistoryRef.current) {
+            setHistory([]);
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setHistoryLoading(false);
+        }
+      }
+    };
+    hasLoadedHistoryRef.current = false;
+    fetchHistory();
+    const interval = setInterval(fetchHistory, 10_000); // Refresh every 10 seconds
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [connectedChain, accountId, orderlyKey, activeTab]);
+
   const handleSettlePnL = async () => {
     if (!wallet || !connectedChain || !brokerId || !orderlyKey) return;
     try {
@@ -190,7 +245,6 @@ export const Assets: FC<{
         );
       }
       showToast('Settle PnL request accepted and is being processed. This may take a while.');
-      // Refresh unsettled PnL after settling
       if (connectedChain && orderlyKey) {
         setTimeout(async () => {
           const pnl = await getUnsettledPnL(
@@ -407,7 +461,47 @@ export const Assets: FC<{
     balance != null ? Number(formatUnits(balance, usdcDecimals)) : undefined;
   const maxWithdrawAmount = vaultBalance != null ? vaultBalance : undefined;
 
-  const hasUnsettledPnL = unsettledPnL != null && unsettledPnL !== 0;
+  const requiresSettlement = 
+    activeTab === 'withdraw' &&
+    amount &&
+    vaultBalance != null &&
+    unsettledPnL != null &&
+    parseFloat(amount) > vaultBalance + unsettledPnL;
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString();
+  };
+
+  const getStatusColor = (status: AssetHistoryItem['trans_status']) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'green';
+      case 'FAILED':
+        return 'red';
+      case 'PROCESSING':
+      case 'CONFIRM':
+      case 'PENDING_REBALANCE':
+        return 'yellow';
+      default:
+        return 'gray';
+    }
+  };
+
+  const getExplorerUrl = (txHash: string) => {
+    if (!connectedChain) return '#';
+    const baseUrl = isTestnet(connectedChain.id)
+      ? 'https://testnet-explorer.orderly.org'
+      : 'https://explorer.orderly.network';
+    return `${baseUrl}/tx/${txHash}`;
+  };
+
+  const getChainLabel = (chainId: string) => {
+    const chainIdHex = chainId.startsWith('0x') 
+      ? chainId 
+      : `0x${Number(chainId).toString(16)}`;
+    const chain = supportedChains.find(({ id }) => id.toLowerCase() === chainIdHex.toLowerCase());
+    return chain ? chain.label : `Chain ${chainId}`;
+  };
 
   return (
     <Flex style={{ margin: '1.5rem', maxWidth: '600px', width: '100%' }} direction="column" gap="4">
@@ -558,6 +652,84 @@ export const Assets: FC<{
             >
               {needsApproval ? 'Approve' : showEOA ? 'Deposit' : 'Deposit to Contract'}
             </Button>
+
+            {/* Deposit History */}
+            {activeTab === 'deposit' && (
+              <Flex direction="column" gap="2" style={{ marginTop: '2rem' }}>
+                <Heading size="4">Deposit History</Heading>
+                {historyLoading ? (
+                  <Text size="2" color="gray">Loading...</Text>
+                ) : history.length === 0 ? (
+                  <Text size="2" color="gray">No deposit history</Text>
+                ) : (
+                  <Flex direction="column" gap="2">
+                    {history.map((item) => (
+                      <Flex
+                        key={item.id}
+                        direction="column"
+                        gap="1"
+                        style={{
+                          padding: '0.75rem',
+                          border: '1px solid var(--gray-6)',
+                          borderRadius: '4px',
+                          backgroundColor: 'var(--gray-2)'
+                        }}
+                      >
+                        <Flex justify="between" align="center">
+                          <Text size="2" weight="medium">
+                            {usdFormatter.format(item.amount)} USDC
+                          </Text>
+                          <Text size="2" color={getStatusColor(item.trans_status)}>
+                            {item.trans_status}
+                          </Text>
+                        </Flex>
+                        <Flex justify="between" align="center">
+                          <Flex direction="column" gap="1" align="start">
+                            <Text size="1" color="gray">
+                              {formatDate(item.created_time)}
+                            </Text>
+                            <Text size="1" color="gray">
+                              {getChainLabel(item.chain_id)}
+                            </Text>
+                          </Flex>
+                          {item.tx_id && (
+                            <Text
+                              size="1"
+                              asChild
+                              style={{
+                                fontFamily: 'monospace',
+                                maxWidth: '200px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              <a
+                                href={getExplorerUrl(item.tx_id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  color: 'inherit',
+                                  textDecoration: 'none',
+                                  cursor: 'pointer'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.textDecoration = 'none';
+                                }}
+                              >
+                                {item.tx_id.slice(0, 10)}...{item.tx_id.slice(-8)}
+                              </a>
+                            </Text>
+                          )}
+                        </Flex>
+                      </Flex>
+                    ))}
+                  </Flex>
+                )}
+              </Flex>
+            )}
           </Flex>
         </Tabs.Content>
 
@@ -623,8 +795,8 @@ export const Assets: FC<{
               </Flex>
             )}
 
-            {/* Unsettled PnL (only show if non-zero) */}
-            {hasUnsettledPnL && (
+            {/* Unsettled PnL  */}
+            {requiresSettlement && unsettledPnL != null && (
               <Callout.Root color="yellow" variant="soft">
                 <Callout.Text>
                   Unsettled PnL: {usdFormatter.format(unsettledPnL)} USDC. Please settle before
@@ -637,7 +809,7 @@ export const Assets: FC<{
             {amount &&
               withdrawFee != null &&
               parseFloat(amount) <= withdrawFee &&
-              !hasUnsettledPnL && (
+              !requiresSettlement && (
                 <Callout.Root color="red" variant="soft">
                   <Callout.Text>
                     Withdraw amount must be greater than the withdraw fee (
@@ -648,7 +820,7 @@ export const Assets: FC<{
 
             <Button
               disabled={
-                hasUnsettledPnL
+                requiresSettlement
                   ? !wallet || !connectedChain || !brokerId || !orderlyKey
                   : !wallet ||
                     !connectedChain ||
@@ -659,10 +831,10 @@ export const Assets: FC<{
                     parseUnits(String(vaultBalance), 6) < parseUnits(amount || '0', 6) ||
                     (withdrawFee != null && parseFloat(amount) <= withdrawFee)
               }
-              onClick={hasUnsettledPnL ? handleSettlePnL : handleWithdraw}
+              onClick={requiresSettlement ? handleSettlePnL : handleWithdraw}
               size="3"
             >
-              {hasUnsettledPnL
+              {requiresSettlement
                 ? showEOA
                   ? 'Settle PnL'
                   : 'Settle Delegate PnL'
@@ -670,6 +842,91 @@ export const Assets: FC<{
                   ? 'Withdraw'
                   : 'Withdraw from Contract'}
             </Button>
+
+            {/* Withdraw History */}
+            {activeTab === 'withdraw' && (
+              <Flex direction="column" gap="2" style={{ marginTop: '2rem' }}>
+                <Heading size="4">Withdraw History</Heading>
+                {historyLoading ? (
+                  <Text size="2" color="gray">Loading...</Text>
+                ) : history.length === 0 ? (
+                  <Text size="2" color="gray">No withdraw history</Text>
+                ) : (
+                  <Flex direction="column" gap="2">
+                    {history.map((item) => (
+                      <Flex
+                        key={item.id}
+                        direction="column"
+                        gap="1"
+                        style={{
+                          padding: '0.75rem',
+                          border: '1px solid var(--gray-6)',
+                          borderRadius: '4px',
+                          backgroundColor: 'var(--gray-2)'
+                        }}
+                      >
+                        <Flex justify="between" align="center">
+                          <Flex direction="column" gap="1">
+                            <Text size="2" weight="medium">
+                              {usdFormatter.format(item.amount)} USDC
+                            </Text>
+                            {item.fee > 0 && (
+                              <Text size="1" color="gray">
+                                Fee: {usdFormatter.format(item.fee)} USDC
+                              </Text>
+                            )}
+                          </Flex>
+                          <Text size="2" color={getStatusColor(item.trans_status)}>
+                            {item.trans_status}
+                          </Text>
+                        </Flex>
+                        <Flex justify="between" align="center">
+                          <Flex direction="column" gap="1" align="start">
+                            <Text size="1" color="gray">
+                              {formatDate(item.created_time)}
+                            </Text>
+                            <Text size="1" color="gray">
+                              {getChainLabel(item.chain_id)}
+                            </Text>
+                          </Flex>
+                          {item.tx_id && (
+                            <Text
+                              size="1"
+                              asChild
+                              style={{
+                                fontFamily: 'monospace',
+                                maxWidth: '200px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              <a
+                                href={getExplorerUrl(item.tx_id)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                  color: 'inherit',
+                                  textDecoration: 'none',
+                                  cursor: 'pointer'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.textDecoration = 'none';
+                                }}
+                              >
+                                {item.tx_id.slice(0, 10)}...{item.tx_id.slice(-8)}
+                              </a>
+                            </Text>
+                          )}
+                        </Flex>
+                      </Flex>
+                    ))}
+                  </Flex>
+                )}
+              </Flex>
+            )}
           </Flex>
         </Tabs.Content>
 
