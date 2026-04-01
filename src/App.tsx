@@ -10,6 +10,7 @@ import {
   TextField
 } from '@radix-ui/themes';
 import { useConnectWallet, useSetChain } from '@web3-onboard/react';
+import { isAddress } from 'ethers';
 import { useEffect, useState } from 'react';
 
 import { Account } from './Account';
@@ -42,6 +43,8 @@ function App() {
   const [registrationType, setRegistrationType] = useState<'eoa' | 'delegatesigner'>('eoa');
   const [brokerIdInputMode, setBrokerIdInputMode] = useState<'dropdown' | 'manual'>('dropdown');
   const [manualBrokerId, setManualBrokerId] = useState<string>('');
+  const [multisigTouched, setMultisigTouched] = useState<boolean>(false);
+  const [multisigError, setMultisigError] = useState<string>('');
 
   const [{ wallet }, connectWallet] = useConnectWallet();
   const [{ connectedChain }] = useSetChain();
@@ -291,8 +294,12 @@ function App() {
                   }
                   setContractAddress(value);
                   setAccountId(undefined);
+                  if (multisigTouched) {
+                    setMultisigError(value && !isAddress(value) ? 'Invalid address' : '');
+                  }
                   if (
                     value &&
+                    isAddress(value) &&
                     brokerId &&
                     connectedChain &&
                     supportedChainIds.includes(connectedChain.id as SupportedChainIds)
@@ -304,7 +311,19 @@ function App() {
                     setActiveTab('delegate-signer');
                   }
                 }}
+                onBlur={() => {
+                  setMultisigTouched(true);
+                  setMultisigError(
+                    contractAddress && !isAddress(contractAddress) ? 'Invalid address' : ''
+                  );
+                }}
+                style={multisigError ? { borderColor: 'var(--red-9)' } : undefined}
               />
+              {multisigError && (
+                <Text size="1" color="red" style={{ marginTop: '4px' }}>
+                  {multisigError}
+                </Text>
+              )}
             </label>
           </Flex>
         )}
