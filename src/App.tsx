@@ -66,7 +66,7 @@ function App() {
             setShowEOA(true);
             setActiveTab('account');
           }
-        } else if (contractAddress) {
+        } else if (contractAddress && isAddress(contractAddress)) {
           setAccountId(getAccountId(contractAddress, savedBrokerId));
           setShowEOA(false);
           setActiveTab('delegate-signer');
@@ -117,17 +117,16 @@ function App() {
       connectedChain &&
       supportedChainIds.includes(connectedChain.id as SupportedChainIds)
     ) {
+      saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
       if (registrationType === 'eoa') {
         const userAddress = wallet.accounts[0].address;
         if (userAddress) {
           setAccountId(getAccountId(userAddress, newBrokerId));
-          saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
           setShowEOA(true);
           setActiveTab('account');
         }
-      } else if (contractAddress) {
+      } else if (contractAddress && isAddress(contractAddress)) {
         setAccountId(getAccountId(contractAddress, newBrokerId));
-        saveBrokerId(connectedChain.id as SupportedChainIds, newBrokerId);
         saveContractAddress(connectedChain.id as SupportedChainIds, contractAddress);
         setShowEOA(false);
         setActiveTab('delegate-signer');
